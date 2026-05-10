@@ -1,0 +1,48 @@
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #f7f0e8;
+}
+
+.menu-glass {
+  backdrop-filter: blur(10px);
+}
+
+.menu-card {
+  transition: all 0.3s ease;
+}
+
+.menu-card:hover {
+  transform: translateY(-4px);
+}
+
+.menu-btn {
+  transition: all 0.3s ease;
+}
+
+.menu-btn:hover {
+  transform: translateY(-2px);
+}
+
+.menu-anchor {
+  scroll-margin-top: 120px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f2e8df;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #7b4521;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9a5b2f;
+}

@@ -16,9 +16,9 @@ export default function NavHeader() {
                 <a href="/galerie" className="hover:text-black transition-colors">
                     Galerie
                 </a>
-                <a href="/menu" className="hover:text-black transition-colors">
+                <Link to="/menu" className="hover:text-black transition-colors">
                     Menu
-                </a>
+                </Link>
                 <Link to="/kontakt" className="bg-black text-white px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors shadow-sm">
                     Rezervace a kontakty
                 </Link>

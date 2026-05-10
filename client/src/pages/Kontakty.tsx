@@ -1,3 +1,7 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 import "./Kontakty.css";
 import {
     ChefHat,
@@ -6,6 +10,8 @@ import {
     MapPin
 } from "lucide-react";
 
+import { CiPhone } from "react-icons/ci";
+
 import {
     FaInstagram,
     FaFacebook
@@ -13,6 +19,21 @@ import {
 
 
 export default function Kontakty() {
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.hash) {
+            const element = document.querySelector(location.hash);
+
+            if (element) {
+                setTimeout(() => {
+                    element.scrollIntoView({
+                        behavior: "smooth",
+                    });
+                }, 100);
+            }
+        }
+    }, [location]);
     return (
         <>
             <section className="contacts-section">
@@ -41,7 +62,9 @@ export default function Kontakty() {
                         <div className="contacts-cards">
 
                             <div className="contact-card">
-                                <div className="contact-icon">📞</div>
+                                <div className="contact-icon">
+                                    <CiPhone />
+                                </div>
 
                                 <div>
                                     <h3>Telefon</h3>
@@ -50,7 +73,9 @@ export default function Kontakty() {
                             </div>
 
                             <div className="contact-card">
-                                <div className="contact-icon">✉️</div>
+                                <div className="contact-icon">
+                                    <Mail />
+                                </div>
 
                                 <div>
                                     <h3>Email</h3>
@@ -59,7 +84,9 @@ export default function Kontakty() {
                             </div>
 
                             <div className="contact-card">
-                                <div className="contact-icon">📍</div>
+                                <div className="contact-icon">
+                                    <MapPin />
+                                </div>
 
                                 <div>
                                     <h3>Adresa</h3>
@@ -200,16 +227,51 @@ export default function Kontakty() {
                             </div>
 
                             <div className="lg:ml-8">
-                                <h3 className="text-xl font-semibold mb-6 text-white tracking-wide">Upozornění</h3>
+                                <h3 className="text-xl font-semibold mb-6 text-white tracking-wide">
+                                    Upozornění
+                                </h3>
+
                                 <ul className="space-y-4">
-                                    {['Alergeny', 'Zázemí', 'Lokace'].map((item) => (
-                                        <li key={item}>
-                                            <a href="#" className="group flex items-center text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300">
-                                                <ArrowRight className="w-4 h-4 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 mr-2" />
-                                                <span className="transform group-hover:translate-x-1 transition-transform duration-300">{item}</span>
-                                            </a>
-                                        </li>
-                                    ))}
+
+                                    <li>
+                                        <a
+                                            href="#"
+                                            className="group flex items-center text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300"
+                                        >
+                                            <ArrowRight className="w-4 h-4 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 mr-2" />
+
+                                            <span className="transform group-hover:translate-x-1 transition-transform duration-300">
+                                                Alergeny
+                                            </span>
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a
+                                            href="#"
+                                            className="group flex items-center text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300"
+                                        >
+                                            <ArrowRight className="w-4 h-4 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 mr-2" />
+
+                                            <span className="transform group-hover:translate-x-1 transition-transform duration-300">
+                                                Zázemí
+                                            </span>
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <Link
+                                            to="/kontakt#lokace"
+                                            className="group flex items-center text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300"
+                                        >
+                                            <ArrowRight className="w-4 h-4 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 mr-2" />
+
+                                            <span className="transform group-hover:translate-x-1 transition-transform duration-300">
+                                                Lokace
+                                            </span>
+                                        </Link>
+                                    </li>
+
                                 </ul>
                             </div>
 
