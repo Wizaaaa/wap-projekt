@@ -1,4 +1,4 @@
-import logoUrl from "../../assets/logo.svg"
+import logoUrl from "../../../public/logo.svg"
 import { Link } from "react-router-dom";
 
 export default function NavHeader() {
