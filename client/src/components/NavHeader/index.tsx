@@ -12,9 +12,9 @@ export default function NavHeader() {
             </a>
 
             <div className="flex items-center gap-6 md:gap-10 text-base md:text-lg font-medium text-main-text">
-                <a href="/galerie" className="hover:text-black transition-colors">
+            <Link to="/galerie" className="hover:text-black transition-colors">
                     Galerie
-                </a>
+                </Link>
                 <Link to="/menu" className="hover:text-black transition-colors">
                     Menu
                 </Link>

@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Kontakty from "./pages/Kontakty/Kontakty"
 import './index.css'
 import Menu from "./pages/Menu/Menu.tsx";
+import Galerie from "./pages/Galerie/Galerie.tsx";
 
 export default function AppRouter() {
   return (
@@ -11,6 +12,7 @@ export default function AppRouter() {
             <Route path="/" element={<Home />}></Route>
             <Route path="/kontakt" element={<Kontakty />}></Route>
             <Route path="/menu" element={<Menu />}></Route>
+            <Route path="/galerie" element={<Galerie />}></Route>
         </Routes>
     </BrowserRouter>
   )
