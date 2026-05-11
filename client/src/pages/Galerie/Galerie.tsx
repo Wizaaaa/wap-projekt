@@ -42,7 +42,7 @@ export default function Galerie() {
         <div className="relative max-w-7xl mx-auto z-10">
 
           <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#e5cdb7] text-[var(--color-main-text)] font-semibold text-sm mb-8 shadow-md">
-            📸 Galerie restaurace
+             Galerie restaurace
           </span>
 
           <h1 className="text-5xl md:text-7xl font-black text-[var(--color-main-text)] leading-[1.05] max-w-5xl animate-[fadeIn_1s_ease]">
@@ -136,7 +136,7 @@ export default function Galerie() {
 
               <div>
                 <span className="inline-block px-5 py-2 rounded-full bg-[#ead7c4] text-[var(--color-main-text)] font-semibold text-sm mb-6">
-                  ✨ Atmosféra U Janka
+                    Atmosféra U Janka
                 </span>
 
                 <h2 className="text-4xl md:text-6xl font-black text-[var(--color-main-text)] leading-tight">
