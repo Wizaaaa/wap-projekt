@@ -1,6 +1,5 @@
 import Footer from "../components/Footer"
 import NavHeader from "../components/NavHeader"
-import Img1 from "../../public/1.png"
 
 
 export default function Home() {
@@ -21,7 +20,7 @@ export default function Home() {
 
             <div className="w-full h-full overflow-hidden">
                 <img
-                    src={Img1}
+                    src="/1.png"
                     alt="Tradiční interiér restaurace U Janka s cihlovým krbem a dřevěnými stoly"
                     className="w-full h-full object-cover transition-transform duration-1000 hover:scale-105"
                 />
