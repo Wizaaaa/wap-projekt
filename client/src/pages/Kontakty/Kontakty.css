@@ -348,3 +348,11 @@
 .facebook:hover {
   transform: translateY(-4px) scale(1.03);
 }
+
+.contacts-scale-wrapper {
+    transform: scale(0.75);
+    transform-origin: top center;
+    width: 133.33%;
+    margin-left: -16.665%;
+}
+
