@@ -46,3 +46,35 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #9a5b2f;
 }
+
+.menu-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.menu-tab {
+  background: #fffaf5;
+  color: #3f2315;
+  border: 1px solid #e4cdbb;
+  border-radius: 999px;
+  padding: 13px 30px;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(44, 24, 10, 0.05);
+  transition: all 0.25s ease;
+}
+
+.menu-tab:hover {
+  transform: translateY(-2px);
+  background: #f3e2d2;
+  border-color: #c99b73;
+}
+
+.menu-tab.active {
+  background: #3f2315;
+  color: white;
+  border-color: #3f2315;
+  box-shadow: 0 12px 25px rgba(63, 35, 21, 0.18);
+}

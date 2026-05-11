@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import {
     ChefHat, ChevronRight, Beer, Drumstick, Soup, Beef,
-    Sparkles, Salad, Pizza, Candy, Coffee, GlassWater, Wine
+    Sparkles, Salad, Pizza, Candy, Coffee, GlassWater
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Footer from "../../components/Footer";
@@ -76,170 +76,114 @@ const foodSections: MenuSection[] = [
         icon: <Sparkles className="h-5 w-5" />,
         items: [
             { name: "Katův šleh z vepřové panenky", description: "hranolky slabé (pikantní)", weight: "150 g", allergens: "1", price: "275 Kč" },
-            { name: "CHEESE BACON BURGER", description: "domácí bulka, 200g hovězí mleté maso, lolo salát, slanina, červená cibule, čedar, okurka, slaninová majonéza, steakové hranolky", weight: "350 g", allergens: "1, 3, 7, 10, 11", price: "329 Kč" },
+            { name: "CHEESE BACON BURGER", description: "domácí bulka, 200g hovězí, čedar, slaninová majonéza, hranolky", weight: "350 g", allergens: "1, 3, 7, 10, 11", price: "329 Kč" },
         ],
     },
     {
         id: "salaty",
         title: "Saláty",
-        subtitle: "Lehčí volba bez ztráty stylu.",
+        subtitle: "Lehčí volba.",
         icon: <Salad className="h-5 w-5" />,
         items: [
-            { name: "Salát CAESAR", description: "slaninové chipsy, krutony z domácího chleba, římský salát, 150g kuřecí prsíčko, ančovičkový dresink, hoblinky parmazánu", weight: "350 g", allergens: "1, 3, 4, 7, 10", price: "269 Kč" },
-            { name: "Grilovaná vepřová panenka na listovém salátu", description: "rukola, grilovaná sezónní zelenina, dip z hrubozrnné hořčice", weight: "350 g", allergens: "10", price: "279 Kč" },
+            { name: "Salát CAESAR", description: "kuřecí prsíčko, ančovičkový dresink, hoblinky parmazánu", weight: "350 g", allergens: "1, 3, 4, 7, 10", price: "269 Kč" },
+            { name: "Grilovaná panenka na listovém salátu", description: "rukola, sezónní zelenina, hořčičný dip", weight: "350 g", allergens: "10", price: "279 Kč" },
         ],
     },
     {
         id: "smazena-jidla",
         title: "Smažená jídla",
-        subtitle: "Jistota, která funguje vždycky.",
+        subtitle: "Hospodská klasika.",
         icon: <Pizza className="h-5 w-5" />,
         items: [
-            { name: "Smažený sýr eidam", description: "domácí tatarka", weight: "100 g", allergens: "1, 3, 7, 10", price: "159 Kč" },
+            { name: "Smažený sýr eidam", weight: "100 g", allergens: "1, 3, 7, 10", price: "159 Kč" },
             { name: "Smažený camembert", weight: "100 g", allergens: "1, 3, 7", price: "159 Kč" },
-            { name: "Kuřecí / vepřový řízek", description: "citrón, okurka", weight: "150 g", allergens: "1, 3, 7, 10", price: "169 Kč" },
+            { name: "Kuřecí / vepřový řízek", weight: "150 g", allergens: "1, 3, 7, 10", price: "169 Kč" },
         ],
     },
     {
         id: "sladke",
         title: "Sladké pokušení",
-        subtitle: "Dezert na konec, když je ještě místo.",
+        subtitle: "Dezert na konec.",
         icon: <Candy className="h-5 w-5" />,
         items: [
-            { name: "Čokoládový fondant", description: "teplá omáčka z lesního ovoce, vanilková zmrzlina", allergens: "1, 3, 7", price: "159 Kč" },
-            { name: "Zmrzlinový pohár", description: "vanilková zmrzlina, karamel, ořechy a šlehačka", allergens: "7, 8", price: "129 Kč" },
-            { name: "Kopeček zmrzliny", description: "vanilková, pistáciová", allergens: "7", price: "39 Kč" },
-            { name: "Dezert dle denní nabídky", price: "dle nabídky" },
+            { name: "Čokoládový fondant", weight: "1ks", allergens: "1, 3, 7", price: "159 Kč" },
+            { name: "Zmrzlinový pohár", weight: "1ks", allergens: "7, 8", price: "129 Kč" },
         ],
     },
     {
         id: "prilohy",
         title: "Přílohy",
-        subtitle: "Doplňky, které dělají jídlo kompletní.",
+        subtitle: "Něco k jídlu.",
         icon: <GlassWater className="h-5 w-5" />,
         items: [
-            { name: "Pečená brambora s česnekovým dipem a čerstvou pažitkou", allergens: "3, 7, 10", price: "99 Kč" },
-            { name: "Mačkané brambory se slaninkou a cibulí", price: "79 Kč" },
-            { name: "Bramborové lupínky", price: "69 Kč" },
-            { name: "Hranolky slabé", price: "59 Kč" },
             { name: "Hranolky steakové", price: "79 Kč" },
-            { name: "Grilovaná sezónní zelenina", price: "139 Kč" },
-            { name: "Domácí chléb 3ks", allergens: "1", price: "45 Kč" },
-            { name: "Topinka 1ks", allergens: "1", price: "10 Kč" },
-        ],
-    },
-    {
-        id: "dipy",
-        title: "Studené omáčky / dipy",
-        subtitle: "Na hranolky, maso i cokoliv navíc.",
-        icon: <Coffee className="h-5 w-5" />,
-        items: [
-            { name: "Tatarská omáčka", allergens: "3, 7, 10", price: "40 Kč" },
-            { name: "Česnekový / ďábelský dip", allergens: "3, 7, 10", price: "55 Kč" },
-            { name: "Kečup", price: "30 Kč" },
-            { name: "Hořčice", allergens: "10", price: "19 Kč" },
-        ],
-    },
-    {
-        id: "teple-omacky",
-        title: "Teplé omáčky",
-        subtitle: "Na steaky a hlavní jídla.",
-        icon: <Coffee className="h-5 w-5" />,
-        items: [
-            { name: "Omáčka ze zeleného pepře s kapkou smetany", allergens: "1, 7", price: "69 Kč" },
-            { name: "Z hrubozrnné hořčice", price: "69 Kč" },
-            { name: "Omáčka z pečeného česneku", allergens: "7", price: "69 Kč" },
+            { name: "Pečená brambora s dipem", price: "99 Kč" },
+            { name: "Grilovaná zelenina", price: "139 Kč" },
         ],
     },
 ];
 
 const drinkSections: MenuSection[] = [
     {
-        id: "aperitivy",
-        title: "Aperitivy",
-        subtitle: "Na rozjezd večera.",
-        icon: <Wine className="h-5 w-5" />,
-        items: [
-            { name: "Martini Bianco", weight: "0,1 l", price: "75 Kč" },
-            { name: "Campari Bitter", weight: "0,04 l", price: "65 Kč" },
-            { name: "Crodino-nealko", weight: "0,1 l", price: "65 Kč" },
-            { name: "Aperol Spritz", weight: "0,4 l", price: "139 Kč" },
-        ],
-    },
-    {
         id: "tocene-pivo",
         title: "Čepované pivo",
-        subtitle: "Klasika, co k Jankovi sedí nejvíc.",
+        subtitle: "Naše nejlepší pivo.",
         icon: <Beer className="h-5 w-5" />,
         items: [
             { name: "Pilsner Urquell ležák", weight: "0,5 l", price: "57 Kč" },
-            { name: "Pilsner Urquell ležák", weight: "0,3 l", price: "46 Kč" },
-            { name: "Šnyt, mlíko", price: "47 Kč" },
             { name: "11° Velkopopovický kozel", weight: "0,5 l", price: "45 Kč" },
-            { name: "11° Velkopopovický kozel", weight: "0,3 l", price: "35 Kč" },
-            { name: "10° Velkopopovický kozel černý", weight: "0,5 l", price: "45 Kč" },
-            { name: "10° Velkopopovický kozel černý", weight: "0,3 l", price: "35 Kč" },
-            { name: "Velkopopovický kozel řezaný", weight: "0,5 l", price: "45 Kč" },
-            { name: "Velkopopovický kozel řezaný", weight: "0,3 l", price: "35 Kč" },
-        ],
-    },
-    {
-        id: "rumy",
-        title: "Rumy",
-        subtitle: "Po světě v jedné řádce.",
-        icon: <Wine className="h-5 w-5" />,
-        items: [
-            { name: "Božkov Republica exclusive / Česká republika", weight: "0,04 l", price: "60 Kč" },
-            { name: "Malibu / Karibik, ostrov Barbados", weight: "0,04 l", price: "60 Kč" },
-            { name: "Havana Club Aňeio 3 Aňos / Kuba", weight: "0,04 l", price: "70 Kč" },
-            { name: "Captain Morgan / Anglie", weight: "0,04 l", price: "65 Kč" },
-            { name: "Bucanero / Dominikánská republika", weight: "0,04 l", price: "80 Kč" },
-            { name: "Legendario / Kuba", weight: "0,04 l", price: "80 Kč" },
-            { name: "Don Papa / Filipíny", weight: "0,04 l", price: "140 Kč" },
-            { name: "Diplomatico reserva Exclusiva / Venezuela", weight: "0,04 l", price: "140 Kč" },
-            { name: "Ron Zacapa Centenario 23.letá / Guatemala", weight: "0,04 l", price: "150 Kč" },
         ],
     },
     {
         id: "nealko",
-        title: "Nealkoholické nápoje",
-        subtitle: "Klasika pro každou návštěvu.",
+        title: "Nealko",
+        subtitle: "Osvěžení.",
         icon: <GlassWater className="h-5 w-5" />,
         items: [
             { name: "Pepsi / Pepsi Zero", weight: "0,25 l", price: "49 Kč" },
-            { name: "Mirinda / 7Up", weight: "0,25 l", price: "49 Kč" },
-            { name: "Evervess Tonic / Ginger Ale", weight: "0,25 l", price: "49 Kč" },
-            { name: "Kinley Rose", weight: "0,25 l", price: "49 Kč" },
-            { name: "Mattoni neperlivá", weight: "0,30 l", price: "49 Kč" },
-            { name: "Mattoni jemně perlivá", weight: "0,30 l", price: "49 Kč" },
             { name: "Džbán vody s citronem", weight: "1 l", price: "75 Kč" },
-            { name: "Redbull", weight: "0,25 l", price: "80 Kč" },
         ],
     },
     {
         id: "kava",
         title: "Káva - Cosmai Caffé",
-        subtitle: "Všechny kávy lze připravit i bez kofeinu.",
+        subtitle: "Klidné posezení.",
         icon: <Coffee className="h-5 w-5" />,
         items: [
             { name: "Espresso", price: "55 Kč" },
-            { name: "Espresso lungo", price: "55 Kč" },
             { name: "Cappuccino", price: "65 Kč" },
             { name: "Latte macchiato", price: "79 Kč" },
-            { name: "Latte macchiato oříškové / kokosové", price: "85 Kč" },
-            { name: "Vídeňská káva", price: "75 Kč" },
-            { name: "Alžírská káva", price: "85 Kč" },
-            { name: "Turecká káva", price: "55 Kč" },
-            { name: "Ledová káva", description: "vanilková zmrzlina, šlehačka, čokoládová poleva", price: "105 Kč" },
         ],
     },
 ];
 
 export default function Menu() {
-    const [activeTab, setActiveTab] = useState<"cz" | "en" | "de">("cz");
+    const [activeCategory, setActiveTab] = useState("jidlo");
 
-    // Spojíme všechny sekce pro zobrazení
-    const allSections = useMemo(() => [...foodSections, ...drinkSections], []);
+const allSections = useMemo(() => [...foodSections, ...drinkSections], []);
+
+const categories = [
+    { id: "jidlo", name: "Jídlo" },
+    { id: "dezerty", name: "Dezerty" },
+    { id: "piti", name: "Pití" },
+];
+
+const filteredSections = useMemo(() => {
+
+    if (activeCategory === "jidlo") {
+        return foodSections.filter((section) => section.id !== "sladke");
+    }
+
+    if (activeCategory === "dezerty") {
+        return allSections.filter((section) => section.id === "sladke");
+    }
+
+    if (activeCategory === "piti") {
+        return drinkSections;
+    }
+
+    return allSections;
+}, [activeCategory, allSections]);
 
     return (
         <main className="min-h-screen bg-[#f7f0e8] text-[#2f241d]">
@@ -269,33 +213,29 @@ export default function Menu() {
                             <button onClick={() => document.getElementById("k-pivu")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Jídlo</button>
                             <button onClick={() => document.getElementById("tocene-pivo")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Nápoje</button>
                             <button onClick={() => document.getElementById("sladke")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Dezerty</button>
-                            <button onClick={() => document.getElementById("kava")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Káva</button>
                         </div>
                         <Link to="/kontakt" className="mt-6 block w-full rounded-2xl bg-[#b87a44] py-4 text-center font-semibold hover:bg-[#c98950] transition shadow-lg">Rezervovat stůl</Link>
                     </div>
                 </div>
 
-                <div className="mt-12 flex flex-wrap gap-3 border-t border-[#ead8ca] pt-8">
-                    {(["cz", "en", "de"] as const).map((lang) => (
-                        <button
-                            key={lang}
-                            type="button"
-                            onClick={() => setActiveTab(lang)}
-                            className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all ${
-                                activeTab === lang ? "bg-[#3f2315] text-white shadow-md" : "bg-white text-[#3f2315] border border-[#d8c4b5] hover:bg-[#f3e2d2]"
-                            }`}
-                        >
-                            {lang === "cz" ? "Čeština" : lang === "en" ? "English" : "Deutsch"}
-                        </button>
-                    ))}
-                    <span className="self-center text-sm text-[#7a6a60] ml-2 italic">Aktuálně je plně vyplněná česká verze.</span>
-                </div>
+                <div className="menu-tabs mt-12 border-t border-[#ead8ca] pt-8">
+    {categories.map((category) => (
+        <button
+            key={category.id}
+            type="button"
+            onClick={() => setActiveTab(category.id)}
+            className={`menu-tab ${activeCategory === category.id ? "active" : ""}`}
+        >
+            {category.name}
+        </button>
+    ))}
+</div>
             </div>
 
             <div className="mx-auto max-w-7xl px-4 pb-20 pt-10 md:px-8 lg:px-10 space-y-8">
-                {allSections.map((section) => (
-                    <MenuCard key={section.id} section={section} />
-                ))}
+            {filteredSections.map((section) => (
+                <MenuCard key={section.id} section={section} />
+            ))}
             </div>
 
             <Footer />
