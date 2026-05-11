@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
     return (
-        <footer className="relative bg-[#ece6df]">
+        <footer className="relative ">
             <div className="relative bg-[#2c1e16] text-[#e8dcc8] overflow-hidden rounded-t-[40px] md:rounded-t-[60px] shadow-[0_-10px_40px_rgba(44,30,22,0.15)]">
 
                 <div
