@@ -1,6 +1,6 @@
 import Footer from "../components/Footer"
 import NavHeader from "../components/NavHeader"
-import Img1 from "../assets/1.png"
+import Img1 from "../../public/1.png"
 
 
 export default function Home() {
