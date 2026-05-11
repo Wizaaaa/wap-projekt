@@ -158,9 +158,32 @@ const drinkSections: MenuSection[] = [
 ];
 
 export default function Menu() {
-    const [activeTab, setActiveTab] = useState<"cz" | "en" | "de">("cz");
+    const [activeCategory, setActiveCategory] = useState("jidlo");
 
-    const allSections = useMemo(() => [...foodSections, ...drinkSections], []);
+const allSections = useMemo(() => [...foodSections, ...drinkSections], []);
+
+const categories = [
+    { id: "jidlo", name: "Jídlo" },
+    { id: "dezerty", name: "Dezerty" },
+    { id: "piti", name: "Pití" },
+];
+
+const filteredSections = useMemo(() => {
+
+    if (activeCategory === "jidlo") {
+        return foodSections.filter((section) => section.id !== "sladke");
+    }
+
+    if (activeCategory === "dezerty") {
+        return allSections.filter((section) => section.id === "sladke");
+    }
+
+    if (activeCategory === "piti") {
+        return drinkSections;
+    }
+
+    return allSections;
+}, [activeCategory, allSections]);
 
     return (
         <main className="min-h-screen bg-[#f7f0e8] text-[#2f241d]">
@@ -195,26 +218,24 @@ export default function Menu() {
                     </div>
                 </div>
 
-                <div className="mt-12 flex flex-wrap gap-3 border-t border-[#ead8ca] pt-8">
-                    {(["cz", "en", "de"] as const).map((lang) => (
-                        <button
-                            key={lang}
-                            type="button"
-                            onClick={() => setActiveTab(lang)}
-                            className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all ${
-                                activeTab === lang ? "bg-[#3f2315] text-white shadow-md" : "bg-white text-[#3f2315] border border-[#d8c4b5] hover:bg-[#f3e2d2]"
-                            }`}
-                        >
-                            {lang === "cz" ? "Čeština" : lang === "en" ? "English" : "Deutsch"}
-                        </button>
-                    ))}
-                </div>
+                <div className="menu-tabs mt-12 border-t border-[#ead8ca] pt-8">
+    {categories.map((category) => (
+        <button
+            key={category.id}
+            type="button"
+            onClick={() => setActiveCategory(category.id)}
+            className={`menu-tab ${activeCategory === category.id ? "active" : ""}`}
+        >
+            {category.name}
+        </button>
+    ))}
+</div>
             </div>
 
             <div className="mx-auto max-w-7xl px-4 pb-20 pt-10 md:px-8 lg:px-10 space-y-8">
-                {allSections.map((section) => (
-                    <MenuCard key={section.id} section={section} />
-                ))}
+            {filteredSections.map((section) => (
+                <MenuCard key={section.id} section={section} />
+            ))}
             </div>
 
             <Footer />
