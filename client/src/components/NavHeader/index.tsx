@@ -1,4 +1,3 @@
-import logoUrl from "../../../public/logo.svg"
 import { Link } from "react-router-dom";
 
 export default function NavHeader() {
@@ -6,7 +5,7 @@ export default function NavHeader() {
         <header className="flex justify-between items-center bg-background px-6 py-4 md:px-12 md:py-6">
             <a href="/">
                 <img
-                    src={logoUrl}
+                    src="/logo.svg"
                     alt="logo"
                     className="w-24 md:w-32 transition-transform hover:scale-105"
                 />
