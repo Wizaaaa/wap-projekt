@@ -1,14 +1,8 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Link } from "react-router-dom";
 
 import "./Kontakty.css";
-import {
-    ChefHat,
-    ArrowRight,
-    Phone, Mail,
-    MapPin
-} from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
 
 import { CiPhone } from "react-icons/ci";
 
@@ -16,7 +10,7 @@ import {
     FaInstagram,
     FaFacebook
 } from "react-icons/fa";
-import Footer from "../components/Footer";
+import Footer from "../../components/Footer";
 
 
 export default function Kontakty() {

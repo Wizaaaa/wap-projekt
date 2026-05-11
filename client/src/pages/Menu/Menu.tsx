@@ -6,8 +6,6 @@ import {
     MapPin
 } from "lucide-react";
 
-import { CiPhone } from "react-icons/ci";
-
 import {
     FaInstagram,
     FaFacebook
@@ -432,7 +430,7 @@ const drinkSections: MenuSection[] = [
 
 function MenuCard({ section }: { section: MenuSection }) {
     return (
-        <section id={section.id} className="scroll-mt-28 rounded-[2rem] border border-[#e8d6c7] bg-white/80 p-6 shadow-[0_10px_30px_rgba(44,24,10,0.06)] backdrop-blur-sm md:p-8">
+        <section id={section.id} className="scroll-mt-28 rounded-4xl border border-[#e8d6c7] bg-white/80 p-6 shadow-[0_10px_30px_rgba(44,24,10,0.06)] backdrop-blur-sm md:p-8">
             <div className="mb-6 flex items-start justify-between gap-4">
                 <div>
                     <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#f4e8de] px-3 py-1 text-sm font-medium text-[#8f5b2d]">
@@ -508,7 +506,7 @@ export default function Menu() {
                         </p>
                     </div>
 
-                    <div className="rounded-[2rem] border border-[#ead8ca] bg-[#3f2315] p-6 text-white shadow-[0_18px_60px_rgba(44,24,10,0.18)] md:p-8">
+                    <div className="rounded-4xl border border-[#ead8ca] bg-[#3f2315] p-6 text-white shadow-[0_18px_60px_rgba(44,24,10,0.18)] md:p-8">
                         <div className="mb-4 text-sm uppercase tracking-[0.25em] text-[#e6c8ad]">Rychlá navigace</div>
                         <div className="flex flex-wrap gap-2">
                             <button

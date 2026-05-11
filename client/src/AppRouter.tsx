@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
-import Kontakty from "./pages/Kontakty"
+import Kontakty from "./pages/Kontakty/Kontakty"
 import './index.css'
-import Menu from "./pages/menu";
+import Menu from "./pages/Menu/Menu.tsx";
 
 export default function AppRouter() {
   return (
