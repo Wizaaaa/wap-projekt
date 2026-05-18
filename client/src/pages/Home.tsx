@@ -1,5 +1,7 @@
 import Footer from "../components/Footer"
 import NavHeader from "../components/NavHeader"
+import {Link} from "react-router-dom";
+
 
 export default function Home() {
   return (
@@ -48,16 +50,16 @@ export default function Home() {
               s přáteli nebo rodinou.
             </p>
 
-            <button className="bg-[#2f241d] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#4a3628] transition">
+            <Link to="/galerie" className="inline-block bg-[#2f241d] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#4a3628] transition">
               Galerie
-            </button>
+            </Link>
           </div>
 
-          <div className="overflow-hidden rounded-[2rem] shadow-[0_12px_40px_rgba(44,24,10,0.15)]">
+          <div className="overflow-hidden rounded-4xl shadow-[0_12px_40px_rgba(44,24,10,0.15)]">
             <img
               src="https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1400&auto=format&fit=crop"
               alt="Restaurace U Janka"
-              className="w-full h-[420px] object-cover hover:scale-105 transition duration-700"
+              className="w-full h-105 object-cover hover:scale-105 transition duration-700"
             />
           </div>
 
@@ -74,7 +76,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-            <div className="bg-[#8b7264] text-white rounded-[2rem] p-10">
+            <div className="bg-[#8b7264] text-white rounded-4xl p-10">
               <h3 className="text-2xl font-bold mb-6">
                 Můžeme vám nabídnout posezení a chutné jídlo
               </h3>
@@ -95,22 +97,22 @@ export default function Home() {
                 a odpočinku během teplých dní.
               </p>
 
-              <button className="mt-8 bg-black text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#2f241d] transition">
+              <Link to="/kontakt" className="inline-block mt-10 bg-[#2f241d] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#4a3628] transition">
                 Rezervace
-              </button>
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 gap-6">
               <img
                 src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop"
                 alt=""
-                className="rounded-[2rem] h-[250px] w-full object-cover"
+                className="rounded-4xl h-62.5 w-full object-cover"
               />
 
               <img
                 src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1200&auto=format&fit=crop"
                 alt=""
-                className="rounded-[2rem] h-[250px] w-full object-cover"
+                className="rounded-4xl h-62.5 w-full object-cover"
               />
             </div>
 
@@ -120,7 +122,7 @@ export default function Home() {
 
       {/* SPECIALITY */}
       <section className="bg-[#f7f0e8] px-6 pb-24 md:px-14">
-        <div className="max-w-7xl mx-auto bg-[#efe2d6] rounded-[2rem] p-10">
+        <div className="max-w-7xl mx-auto bg-[#efe2d6] rounded-4xl p-10">
 
           <h2 className="text-4xl md:text-5xl font-black text-[#2f241d] mb-3">
             Co u nás ochutnat?
@@ -156,7 +158,7 @@ export default function Home() {
             ].map((item) => (
               <div
                 key={item.name}
-                className="bg-white rounded-[1.5rem] overflow-hidden shadow-md hover:-translate-y-2 transition duration-500"
+                className="bg-white rounded-3xl overflow-hidden shadow-md hover:-translate-y-2 transition duration-500"
               >
                 <img
                   src={item.img}
@@ -179,9 +181,9 @@ export default function Home() {
           </div>
 
           <div className="flex justify-center mt-10">
-            <button className="bg-[#2f241d] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#4a3628] transition">
+            <Link to="/menu" className="bg-[#2f241d] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#4a3628] transition">
               Celé menu
-            </button>
+            </Link>
           </div>
 
         </div>
