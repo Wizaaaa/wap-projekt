@@ -92,9 +92,9 @@ export default function Footer() {
                         <div>
                             <h3 className="text-xl font-semibold mb-6 text-white tracking-wide">Nabídka</h3>
                             <ul className="space-y-4">
-                                {['Naše jídla', 'Denní menu', 'Nápojový lístek', 'Zaměstnanci'].map((item) => (
+                                {['Naše jídla', 'Nápojový lístek', 'Dezerty'].map((item) => (
                                     <li key={item}>
-                                        <a href="#" className="group flex items-center text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300">
+                                        <a href="/menu" className="group flex items-center text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300">
                                             <ArrowRight className="w-4 h-4 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 mr-2" />
                                             <span className="transform group-hover:translate-x-1 transition-transform duration-300">{item}</span>
                                         </a>

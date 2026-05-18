@@ -57,7 +57,7 @@ export default function Home() {
 
           <div className="overflow-hidden rounded-4xl shadow-[0_12px_40px_rgba(44,24,10,0.15)]">
             <img
-              src="https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1400&auto=format&fit=crop"
+              src="/2.png"
               alt="Restaurace U Janka"
               className="w-full h-105 object-cover hover:scale-105 transition duration-700"
             />
@@ -110,7 +110,7 @@ export default function Home() {
               />
 
               <img
-                src="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1200&auto=format&fit=crop"
+                src="/3.jpg"
                 alt=""
                 className="rounded-4xl h-62.5 w-full object-cover"
               />
