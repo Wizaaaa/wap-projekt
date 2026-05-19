@@ -296,14 +296,13 @@ export default function Menu() {
                         </p>
                     </div>
 
-                    <div className="rounded-4xl bg-[#3f2315] p-6 text-white md:p-8 shadow-xl">
-                        <div className="mb-4 text-sm uppercase tracking-[0.25em] text-[#e6c8ad] ">Rychlá navigace</div>
-                        <div className="flex flex-wrap gap-2">
-                            <button onClick={() => handleTabChange("jidlo")} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Jídlo</button>
-                            <button onClick={() => handleTabChange("piti")} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Nápoje</button>
-                            <button onClick={() => handleTabChange("dezerty")} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Dezerty</button>
-                        </div>
-                        <Link to="/kontakt" className="mt-6 block w-full rounded-2xl bg-[#b87a44] py-4 text-center font-semibold hover:bg-[#c98950] transition shadow-lg">Rezervovat stůl</Link>
+                    <div className="flex flex-col justify-center lg:justify-end lg:items-end">
+                        <Link
+                            to="/kontakt"
+                            className="inline-block rounded-2xl bg-[#b87a44] px-12 py-5 text-lg text-center font-bold text-white hover:bg-[#c98950] hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 shadow-xl whitespace-nowrap"
+                        >
+                            Rezervovat stůl
+                        </Link>
                     </div>
                 </div>
 
