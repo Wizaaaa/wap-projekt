@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import {useEffect, useMemo} from "react";
 import {
     ChefHat, ChevronRight, Beer, Drumstick, Soup, Beef,
     Sparkles, Salad, Pizza, Candy, Coffee, GlassWater, Wine
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import Footer from "../../components/Footer";
 import MenuCard, { type MenuSection } from "../../components/MenuCard";
 import "./Menu.css";
@@ -229,27 +229,46 @@ const drinkSections: MenuSection[] = [
 ];
 
 export default function Menu() {
-    const [activeCategory, setActiveTab] = useState("jidlo");
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const hash = location.hash.replace("#", "");
+
+    const activeCategory = ["jidlo", "dezerty", "piti"].includes(hash) ? hash : "jidlo";
+
+    useEffect(() => {
+        if (!hash || ["jidlo", "dezerty", "piti"].includes(hash)) {
+            window.scrollTo({ top: 0, behavior: "instant" });
+        } else if (hash) {
+            setTimeout(() => {
+                const element = document.getElementById(hash);
+                if (element) {
+                    element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            }, 100);
+        }
+    }, [hash]);
+
+    const handleTabChange = (categoryId: string) => {
+        navigate(`#${categoryId}`, { replace: true });
+    };
 
     const allSections = useMemo(() => [...foodSections, ...drinkSections], []);
 
     const categories = [
         { id: "jidlo", name: "Jídlo" },
-        { id: "dezerty", name: "Dezerty" },
         { id: "piti", name: "Pití" },
+        { id: "dezerty", name: "Dezerty" }
     ];
 
     const filteredSections = useMemo(() => {
         if (activeCategory === "jidlo") {
-            // Vrací všechno jídlo kromě sladkého
             return foodSections.filter((section) => section.id !== "sladke");
         }
         if (activeCategory === "dezerty") {
-            // Vrací pouze sekci sladké (dezerty)
             return foodSections.filter((section) => section.id === "sladke");
         }
         if (activeCategory === "piti") {
-            // Vrací celé nápojové menu
             return drinkSections;
         }
         return allSections;
@@ -277,12 +296,14 @@ export default function Menu() {
                         </p>
                     </div>
 
-                    <Link
-                        to="/kontakt"
-                        className="mt-6 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#c98950] to-[#b87a44] px-8 py-4 text-center font-semibold text-white transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(201,137,80,0.35)]"
-                    >
-                        Rezervovat stůl
-                    </Link>
+                    <div className="flex flex-col justify-center lg:justify-end lg:items-end">
+                        <Link
+                            to="/kontakt"
+                            className="inline-block rounded-2xl bg-[#b87a44] px-12 py-5 text-lg text-center font-bold text-white hover:bg-[#c98950] hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 shadow-xl whitespace-nowrap"
+                        >
+                            Rezervovat stůl
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="menu-tabs mt-12 border-t border-[#ead8ca] pt-8">
@@ -290,7 +311,7 @@ export default function Menu() {
                         <button
                             key={category.id}
                             type="button"
-                            onClick={() => setActiveTab(category.id)}
+                            onClick={() => handleTabChange(category.id)}
                             className={`menu-tab ${activeCategory === category.id ? "active" : ""}`}
                         >
                             {category.name}
