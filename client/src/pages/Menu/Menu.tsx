@@ -277,15 +277,12 @@ export default function Menu() {
                         </p>
                     </div>
 
-                    <div className="rounded-4xl bg-[#3f2315] p-6 text-white md:p-8 shadow-xl">
-                        <div className="mb-4 text-sm uppercase tracking-[0.25em] text-[#e6c8ad] ">Rychlá navigace</div>
-                        <div className="flex flex-wrap gap-2">
-                            <button onClick={() => document.getElementById("k-pivu")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Jídlo</button>
-                            <button onClick={() => document.getElementById("tocene-pivo")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Nápoje</button>
-                            <button onClick={() => document.getElementById("sladke")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Dezerty</button>
-                        </div>
-                        <Link to="/kontakt" className="mt-6 block w-full rounded-2xl bg-[#b87a44] py-4 text-center font-semibold hover:bg-[#c98950] transition shadow-lg">Rezervovat stůl</Link>
-                    </div>
+                    <Link
+                        to="/kontakt"
+                        className="mt-6 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#c98950] to-[#b87a44] px-8 py-4 text-center font-semibold text-white transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-[0_10px_30px_rgba(201,137,80,0.35)]"
+                    >
+                        Rezervovat stůl
+                    </Link>
                 </div>
 
                 <div className="menu-tabs mt-12 border-t border-[#ead8ca] pt-8">
