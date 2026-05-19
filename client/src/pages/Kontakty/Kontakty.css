@@ -349,10 +349,10 @@
   transform: translateY(-4px) scale(1.03);
 }
 
-.contacts-scale-wrapper {
-    transform: scale(0.75);
+.contacts-scale {
+    transform: scale(0.8);
     transform-origin: top center;
-    width: 133.33%;
-    margin-left: -16.665%;
+    width: 125%;
+    margin-left: -12.5%;
+    margin-bottom: -180px;
 }
-
