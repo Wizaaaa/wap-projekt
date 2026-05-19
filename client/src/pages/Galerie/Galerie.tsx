@@ -6,24 +6,24 @@ const sections = [
     title: "Restaurace",
     desc: "Moderní interiér, poctivá česká kuchyně a příjemná atmosféra.",
     images: [
-      "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1400&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1400&auto=format&fit=crop",
+      "4.avif",
+      "5.avif",
     ],
   },
   {
     title: "Pivnice",
     desc: "Pořádně načepované pivo, sportovní atmosféra a večerní posezení.",
     images: [
-      "https://images.unsplash.com/photo-1541544181051-e46607d640b6?q=80&w=1400&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1400&auto=format&fit=crop",
+      "6.avif",
+      "7.avif",
     ],
   },
   {
     title: "Zahrádka",
     desc: "Klidné venkovní posezení ideální pro letní večery.",
     images: [
-      "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1400&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1400&auto=format&fit=crop",
+      "8.avif",
+      "9.avif",
     ],
   },
 ];
@@ -157,7 +157,7 @@ export default function Galerie() {
                   <div className="absolute -top-5 -left-5 w-full h-full border-2 border-[#cba98d] rounded-[2.5rem]"></div>
 
                   <img
-                      src="https://images.unsplash.com/photo-1552566626-52f8b828add9?q=80&w=1400&auto=format&fit=crop"
+                      src="10.avif"
                       alt="Interiér"
                       className="relative rounded-[2.5rem] h-125 w-full object-cover shadow-2xl"
                   />
