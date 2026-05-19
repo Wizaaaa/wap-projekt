@@ -1,9 +1,9 @@
-import { useMemo, useState } from "react";
+import {useEffect, useMemo} from "react";
 import {
     ChefHat, ChevronRight, Beer, Drumstick, Soup, Beef,
     Sparkles, Salad, Pizza, Candy, Coffee, GlassWater, Wine
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import Footer from "../../components/Footer";
 import MenuCard, { type MenuSection } from "../../components/MenuCard";
 import "./Menu.css";
@@ -229,27 +229,46 @@ const drinkSections: MenuSection[] = [
 ];
 
 export default function Menu() {
-    const [activeCategory, setActiveTab] = useState("jidlo");
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const hash = location.hash.replace("#", "");
+
+    const activeCategory = ["jidlo", "dezerty", "piti"].includes(hash) ? hash : "jidlo";
+
+    useEffect(() => {
+        if (!hash || ["jidlo", "dezerty", "piti"].includes(hash)) {
+            window.scrollTo({ top: 0, behavior: "instant" });
+        } else if (hash) {
+            setTimeout(() => {
+                const element = document.getElementById(hash);
+                if (element) {
+                    element.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            }, 100);
+        }
+    }, [hash]);
+
+    const handleTabChange = (categoryId: string) => {
+        navigate(`#${categoryId}`, { replace: true });
+    };
 
     const allSections = useMemo(() => [...foodSections, ...drinkSections], []);
 
     const categories = [
         { id: "jidlo", name: "Jídlo" },
-        { id: "dezerty", name: "Dezerty" },
         { id: "piti", name: "Pití" },
+        { id: "dezerty", name: "Dezerty" }
     ];
 
     const filteredSections = useMemo(() => {
         if (activeCategory === "jidlo") {
-            // Vrací všechno jídlo kromě sladkého
             return foodSections.filter((section) => section.id !== "sladke");
         }
         if (activeCategory === "dezerty") {
-            // Vrací pouze sekci sladké (dezerty)
             return foodSections.filter((section) => section.id === "sladke");
         }
         if (activeCategory === "piti") {
-            // Vrací celé nápojové menu
             return drinkSections;
         }
         return allSections;
@@ -280,9 +299,9 @@ export default function Menu() {
                     <div className="rounded-4xl bg-[#3f2315] p-6 text-white md:p-8 shadow-xl">
                         <div className="mb-4 text-sm uppercase tracking-[0.25em] text-[#e6c8ad] ">Rychlá navigace</div>
                         <div className="flex flex-wrap gap-2">
-                            <button onClick={() => document.getElementById("k-pivu")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Jídlo</button>
-                            <button onClick={() => document.getElementById("tocene-pivo")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Nápoje</button>
-                            <button onClick={() => document.getElementById("sladke")?.scrollIntoView({ behavior: "smooth" })} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Dezerty</button>
+                            <button onClick={() => handleTabChange("jidlo")} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Jídlo</button>
+                            <button onClick={() => handleTabChange("piti")} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Nápoje</button>
+                            <button onClick={() => handleTabChange("dezerty")} className="rounded-full bg-white/10 px-4 py-2 hover:bg-white hover:text-[#3f2315] transition">Dezerty</button>
                         </div>
                         <Link to="/kontakt" className="mt-6 block w-full rounded-2xl bg-[#b87a44] py-4 text-center font-semibold hover:bg-[#c98950] transition shadow-lg">Rezervovat stůl</Link>
                     </div>
@@ -293,7 +312,7 @@ export default function Menu() {
                         <button
                             key={category.id}
                             type="button"
-                            onClick={() => setActiveTab(category.id)}
+                            onClick={() => handleTabChange(category.id)}
                             className={`menu-tab ${activeCategory === category.id ? "active" : ""}`}
                         >
                             {category.name}
