@@ -104,7 +104,7 @@ export default function Home() {
 
               <div className="grid grid-cols-1 gap-6">
                 <img
-                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop"
+                    src="11.avif"
                     alt=""
                     className="rounded-4xl h-62.5 w-full object-cover"
                 />
@@ -138,7 +138,7 @@ export default function Home() {
                 {
                   name: "Pečené koleno",
                   desc: "s hořčicí a křenem",
-                  img: "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200&auto=format&fit=crop",
+                  img: "3.png",
                   hash: "tradicni" // Přidáno mapování na ID sekce v Menu
                 },
                 {
@@ -150,7 +150,7 @@ export default function Home() {
                 {
                   name: "Smažený sýr",
                   desc: "s hranolky a tatarkou",
-                  img: "https://images.unsplash.com/photo-1608039755401-742074f0548d?q=80&w=1200&auto=format&fit=crop",
+                  img: "4.jpg",
                   hash: "smazena-jidla"
                 },
                 {
