@@ -1,27 +1,111 @@
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 export default function NavHeader() {
-    return (
-        <header className="flex justify-between items-center bg-background px-6 py-4 md:px-12 md:py-6">
-            <a href="/">
-                <img
-                    src="/logo.svg"
-                    alt="logo"
-                    className="w-24 md:w-32 transition-transform hover:scale-105"
-                />
-            </a>
+    const location = useLocation();
+    const [isScrolled, setIsScrolled] = useState(false);
 
-            <div className="flex items-center gap-6 md:gap-10 text-base md:text-lg font-medium text-main-text">
-            <Link to="/galerie" className="hover:text-black transition-colors">
-                    Galerie
+    // Sledování scrollování pro změnu vzhledu hlavičky
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 20);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    const isActive = (path: string) => location.pathname === path;
+    const isMenuPath = location.pathname.includes("/menu");
+
+    return (
+        <header
+            className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+                isScrolled
+                    ? "bg-[#f7f0e8]/95 backdrop-blur-lg border-b border-[#e5d5c5]/50 shadow-md py-3"
+                    : "bg-transparent py-6"
+            }`}
+        >
+            <div className="max-w-7xl mx-auto flex justify-between items-center px-6 md:px-14">
+
+                {/* Logo */}
+                <Link to="/" className="group">
+                    <img
+                        src="/logo.svg"
+                        alt="Restaurace U Janka"
+                        className={`transition-all duration-500 ease-out group-hover:scale-105 ${
+                            isScrolled ? "w-20 md:w-28 filter-none" : "w-24 md:w-32 brightness-200"
+                        }`}
+                    />
                 </Link>
-                <Link to="/menu" className="hover:text-black transition-colors">
-                    Menu
-                </Link>
-                <Link to="/kontakt" className="bg-black text-white px-5 py-2.5 rounded-xl hover:bg-gray-800 transition-colors shadow-sm">
-                    Rezervace a kontakty
-                </Link>
+
+                {/* Navigace */}
+                <div className="flex items-center gap-6 md:gap-10">
+                    <nav className="hidden sm:flex items-center gap-8 text-base md:text-lg font-semibold">
+
+                        {/* GALERIE */}
+                        <Link
+                            to="/galerie"
+                            className={`relative group transition-colors duration-300 ${
+                                isScrolled
+                                    ? isActive("/galerie") ? "text-[#2f241d]" : "text-[#6f6158] hover:text-[#2f241d]"
+                                    : "text-white/90 hover:text-white"
+                            }`}
+                        >
+                            Galerie
+                            <span className={`absolute -bottom-1 left-0 h-[2px] transition-all duration-300 ${
+                                isActive("/galerie") ? "w-full bg-[#c1a089]" : "w-0 bg-[#c1a089] group-hover:w-full"
+                            }`}></span>
+                        </Link>
+
+                        {/* MENU (S DROPDOWNEM) */}
+                        <div className="relative group">
+                            <Link
+                                to="/menu"
+                                className={`flex items-center gap-1 relative transition-colors duration-300 py-2 ${
+                                    isScrolled
+                                        ? isMenuPath ? "text-[#2f241d]" : "text-[#6f6158] hover:text-[#2f241d]"
+                                        : "text-white/90 hover:text-white"
+                                }`}
+                            >
+                                Menu
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-1 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                                </svg>
+                                <span className={`absolute bottom-1 left-0 h-[2px] transition-all duration-300 ${
+                                    isMenuPath ? "w-full bg-[#c1a089]" : "w-0 bg-[#c1a089] group-hover:w-full"
+                                }`}></span>
+                            </Link>
+
+                            {/* Dropdown nabídka */}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-[#f7f0e8] border border-[#e5d5c5] rounded-xl shadow-xl opacity-0 invisible translate-y-2 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 overflow-hidden">
+                                <Link to="/menu#hlavni-jidla" className="block px-4 py-3 text-[#6f6158] hover:bg-[#efe2d6] hover:text-[#2f241d] font-medium transition">
+                                    Hlavní jídla
+                                </Link>
+                                <Link to="/menu#speciality" className="block px-4 py-3 text-[#6f6158] hover:bg-[#efe2d6] hover:text-[#2f241d] font-medium transition">
+                                    Speciality
+                                </Link>
+                                <Link to="/menu#napoje" className="block px-4 py-3 text-[#6f6158] hover:bg-[#efe2d6] hover:text-[#2f241d] font-medium transition border-t border-[#e5d5c5]/50">
+                                    Nápoje
+                                </Link>
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* CTA Rezervace */}
+                    <Link
+                        to="/kontakt"
+                        className={`px-6 py-2.5 md:px-8 md:py-3 rounded-full font-bold text-sm md:text-base transition-all duration-300 transform hover:-translate-y-0.5 ${
+                            isActive("/kontakt")
+                                ? "bg-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.3)]"
+                                : isScrolled
+                                    ? "bg-[#2f241d] text-white hover:bg-emerald-600 hover:shadow-[0_4px_20px_rgba(16,185,129,0.3)]"
+                                    : "bg-white text-[#2f241d] hover:bg-emerald-600 hover:text-white"
+                        }`}
+                    >
+                        Rezervace
+                    </Link>
+                </div>
             </div>
         </header>
-    )
+    );
 }

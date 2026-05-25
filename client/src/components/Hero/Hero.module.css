@@ -1,0 +1,40 @@
+/* Hero.module.css */
+.heroContainer {
+    background-color: #1a1512;
+}
+
+.spiceBackground {
+    position: relative;
+    /* Zde používáme profesionální fotku koření a překrýváme ji tmavým gradientem, aby byl text krásně čitelný */
+    background-image:
+            linear-gradient(to right, rgba(26, 21, 18, 0.95) 0%, rgba(26, 21, 18, 0.8) 50%, rgba(26, 21, 18, 0.95) 100%),
+            url('https://images.unsplash.com/photo-1596040033229-a9821ebd058d?q=80&w=2000&auto=format&fit=crop');
+
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* Animace (pokud je nemáte definované globálně) */
+@keyframes enterFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes enterSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+:global(.animate-enter-fade-in) {
+    animation: enterFadeIn 1s ease-out forwards;
+}
+
+:global(.animate-enter-slide-up) {
+    animation: enterSlideUp 0.8s ease-out forwards;
+}
+
+/* Zpoždění pro plynulejší nástup */
+:global(.animation-delay-200) { animation-delay: 0.2s; }
+:global(.animation-delay-400) { animation-delay: 0.4s; }
+:global(.animation-delay-600) { animation-delay: 0.6s; }
