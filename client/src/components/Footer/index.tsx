@@ -105,7 +105,7 @@ export default function Footer() {
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://maps.google.com/?q=Karla+Veselého+795,+Kosmonosy" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-4 text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300">
+                                    <a href="https://www.google.com/maps/place/U+Janka/@50.4374137,14.9264144,21z/data=!4m15!1m8!3m7!1s0x47095445597e174f:0xd66f2814823b48b0!2sKarla+Veselého+795,+293+06+Kosmonosy!3b1!8m2!3d50.4373771!4d14.9267005!16s%2Fg%2F11csn10dgm!3m5!1s0x470955f3f22eee81:0x2db3a148caa94267!8m2!3d50.4373771!4d14.9267005!16s%2Fg%2F11fd6mxg8f?entry=ttu&g_ep=EgoyMDI2MDUyMC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-4 text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300">
                                         <div className="p-2 rounded-lg bg-[#3e2b1f] group-hover:bg-[#f4a261] group-hover:text-[#2c1e16] transition-colors duration-300">
                                             <MapPin className="w-4 h-4" />
                                         </div>
