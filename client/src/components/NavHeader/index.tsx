@@ -5,7 +5,12 @@ export default function NavHeader() {
     const location = useLocation();
     const [isScrolled, setIsScrolled] = useState(false);
 
-    // Sledování scrollování pro změnu vzhledu hlavičky
+    // Zjistíme, jestli jsme na domovské stránce
+    const isHome = location.pathname === "/";
+
+    // Pokud JSME odscrollovaní NEBO NEJSME na domovské stránce, potřebujeme tmavé prvky
+    const useDarkItems = isScrolled || !isHome;
+
     useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 20);
@@ -21,7 +26,7 @@ export default function NavHeader() {
         <header
             className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
                 isScrolled
-                    ? "bg-[#f7f0e8]/95 backdrop-blur-lg border-b border-[#e5d5c5]/50 shadow-md py-3"
+                    ? "bg-[#f7f0e8]/95 backdrop-blur-md shadow-[0_4px_30px_rgba(0,0,0,0.06)] py-3"
                     : "bg-transparent py-6"
             }`}
         >
@@ -33,8 +38,13 @@ export default function NavHeader() {
                         src="/logo.svg"
                         alt="Restaurace U Janka"
                         className={`transition-all duration-500 ease-out group-hover:scale-105 ${
-                            isScrolled ? "w-20 md:w-28 filter-none" : "w-24 md:w-32 brightness-200"
+                            // Velikost loga se mění jen podle scrollování
+                            isScrolled ? "w-20 md:w-28" : "w-24 md:w-32"
+                        } ${
+                            // Barva loga se mění podle toho, jestli potřebujeme tmavé prvky
+                            useDarkItems ? "filter-none opacity-100" : "brightness-0 invert opacity-90"
                         }`}
+                        style={{ willChange: "filter, width, transform" }}
                     />
                 </Link>
 
@@ -42,11 +52,27 @@ export default function NavHeader() {
                 <div className="flex items-center gap-6 md:gap-10">
                     <nav className="hidden sm:flex items-center gap-8 text-base md:text-lg font-semibold">
 
+                        {/* DOMŮ */}
+                        <Link
+                            to="/"
+                            className={`relative group transition-colors duration-300 ${
+                                useDarkItems
+                                    ? isActive("/") ? "text-[#2f241d]" : "text-[#6f6158] hover:text-[#2f241d]"
+                                    : "text-white/90 hover:text-white"
+                            }`}
+                        >
+                            Domů
+                            <span className={`absolute -bottom-1 left-0 h-[2px] transition-all duration-300 ${
+                                isActive("/") ? "w-full bg-[#c1a089]" : "w-0 bg-[#c1a089] group-hover:w-full"
+                            }`}></span>
+                        </Link>
+
+
                         {/* GALERIE */}
                         <Link
                             to="/galerie"
                             className={`relative group transition-colors duration-300 ${
-                                isScrolled
+                                useDarkItems
                                     ? isActive("/galerie") ? "text-[#2f241d]" : "text-[#6f6158] hover:text-[#2f241d]"
                                     : "text-white/90 hover:text-white"
                             }`}
@@ -62,7 +88,7 @@ export default function NavHeader() {
                             <Link
                                 to="/menu"
                                 className={`flex items-center gap-1 relative transition-colors duration-300 py-2 ${
-                                    isScrolled
+                                    useDarkItems
                                         ? isMenuPath ? "text-[#2f241d]" : "text-[#6f6158] hover:text-[#2f241d]"
                                         : "text-white/90 hover:text-white"
                                 }`}
@@ -97,9 +123,9 @@ export default function NavHeader() {
                         className={`px-6 py-2.5 md:px-8 md:py-3 rounded-full font-bold text-sm md:text-base transition-all duration-300 transform hover:-translate-y-0.5 ${
                             isActive("/kontakt")
                                 ? "bg-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.3)]"
-                                : isScrolled
+                                : useDarkItems
                                     ? "bg-[#2f241d] text-white hover:bg-emerald-600 hover:shadow-[0_4px_20px_rgba(16,185,129,0.3)]"
-                                    : "bg-white text-[#2f241d] hover:bg-emerald-600 hover:text-white"
+                                    : "bg-white text-[#2f241d] hover:bg-emerald-600 hover:text-white hover:shadow-[0_4px_20px_rgba(16,185,129,0.3)]"
                         }`}
                     >
                         Rezervace

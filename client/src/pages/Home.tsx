@@ -45,6 +45,7 @@ export default function Home() {
   });
 
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showDiscoverMore, setShowDiscoverMore] = useState(true);
 
   useEffect(() => {
     const checkTime = () => {
@@ -73,7 +74,15 @@ export default function Home() {
     const interval = setInterval(checkTime, 60000);
 
     const handleScroll = () => {
+      // Tlačítko "Vyjet nahoru" se ukáže po scrollování o více než 400px
       setShowScrollTop(window.scrollY > 400);
+
+      // Tlačítko "Objevte více" ZMIZÍ, jakmile uživatel sjede o víc než 100px dolů
+      if (window.scrollY > 100) {
+        setShowDiscoverMore(false);
+      } else {
+        setShowDiscoverMore(true);
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -85,7 +94,7 @@ export default function Home() {
   }, []);
 
   // Využití integrovaných funkcí
-  const handleScrollToAbout = () => smoothScrollToId("o-nas");
+  const handleScrollToAbout = () => smoothScrollToId("o-nas", 80);
   const handleScrollToTop = () => smoothScrollTo(0);
 
   return (
@@ -110,7 +119,7 @@ export default function Home() {
             <div className="flex items-center justify-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 px-6 py-3 rounded-full shadow-2xl mb-8 transform hover:scale-105 transition duration-500">
             <span className="relative flex h-3.5 w-3.5">
               {openStatus.state !== "closed" && (
-                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${openStatus.dotColor}`}></span>
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${openStatus.dotColor} `}></span>
               )}
               <span className={`relative inline-flex rounded-full h-3.5 w-3.5 ${openStatus.dotColor}`}></span>
             </span>
@@ -138,13 +147,30 @@ export default function Home() {
             </div>
           </div>
 
-          {/* FUNKČNÍ INDIKÁTOR SCROLLOVÁNÍ */}
+          {/* INDIKÁTOR SCROLLOVÁNÍ, KTERÝ PŘI SCROLLU PLYNULE ZMIZÍ */}
           <button
               onClick={handleScrollToAbout}
-              className="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center opacity-70 hover:opacity-100 transition duration-300 group"
+              className={`absolute bottom-2 md:bottom-4 left-1/2 transform -translate-x-1/2 flex flex-col items-center p-4 transition-all duration-700 cursor-pointer group z-20 ${
+                  showDiscoverMore
+                      ? "opacity-60 hover:opacity-100 visible translate-y-0"
+                      : "opacity-0 invisible translate-y-4 pointer-events-none" // Plynule odjede dolů a zmizí
+              }`}
           >
-            <span className="text-white text-xs tracking-[0.3em] font-medium uppercase mb-3 group-hover:-translate-y-2 transition-transform">Objevte více</span>
-            <div className="w-[1px] h-14 bg-gradient-to-b from-white to-transparent opacity-50 group-hover:h-20 transition-all duration-500"></div>
+          <span className="text-white text-[10px] md:text-xs tracking-[0.4em] font-medium uppercase mb-3 transition-all duration-300 group-hover:text-[#c1a089]">
+            Objevte více
+          </span>
+
+            <div className="h-10 flex justify-center items-start">
+              <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-white/80 animate-bounce group-hover:text-[#c1a089] transition-colors duration-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </div>
           </button>
         </section>
 
