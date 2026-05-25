@@ -1,5 +1,6 @@
 import Footer from "../../components/Footer";
 import NavHeader from "../../components/NavHeader";
+import {Link} from "react-router-dom";
 
 const sections = [
   {
@@ -147,9 +148,9 @@ export default function Galerie() {
                     stylové prostředí a poctivou gastronomii.
                   </p>
 
-                  <button className="mt-10 px-8 py-4 rounded-2xl bg-main-text text-white font-semibold hover:scale-105 hover:shadow-xl transition duration-300">
+                  <Link to="/kontakt" className="mt-10 inline-block px-8 py-4 rounded-2xl bg-main-text text-white font-semibold hover:scale-105 hover:shadow-xl transition duration-300">
                     Rezervovat stůl
-                  </button>
+                  </Link>
                 </div>
 
                 <div className="relative">
