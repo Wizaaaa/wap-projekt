@@ -4,7 +4,7 @@ import Kontakty from "./pages/Kontakty/Kontakty"
 import './index.css'
 import Menu from "./pages/Menu/Menu.tsx";
 import Galerie from "./pages/Galerie/Galerie.tsx";
-import AdminPanel from "./pages/AdminPanel.tsx";
+import AdminPanel from "./pages/AdminPanel/AdminPanel.tsx";
 
 export default function AppRouter() {
   return (

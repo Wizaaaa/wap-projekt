@@ -3,9 +3,6 @@ import { Link } from "react-router-dom";
 import Footer from "../components/Footer";
 import NavHeader from "../components/NavHeader";
 
-// ==========================================
-// POMOCNÉ FUNKCE PRO PLYNULÝ SCROLL
-// ==========================================
 const smoothScrollTo = (targetY: number, duration: number = 800) => {
   const startingY = window.pageYOffset;
   const diff = targetY - startingY;
@@ -35,7 +32,6 @@ const smoothScrollToId = (id: string, offset: number = 100, duration: number = 8
     smoothScrollTo(targetY, duration);
   }
 };
-// ==========================================
 
 export default function Home() {
   const [openStatus, setOpenStatus] = useState({
@@ -74,10 +70,8 @@ export default function Home() {
     const interval = setInterval(checkTime, 60000);
 
     const handleScroll = () => {
-      // Tlačítko "Vyjet nahoru" se ukáže po scrollování o více než 400px
       setShowScrollTop(window.scrollY > 400);
 
-      // Tlačítko "Objevte více" ZMIZÍ, jakmile uživatel sjede o víc než 100px dolů
       if (window.scrollY > 100) {
         setShowDiscoverMore(false);
       } else {
@@ -93,7 +87,6 @@ export default function Home() {
     };
   }, []);
 
-  // Využití integrovaných funkcí
   const handleScrollToAbout = () => smoothScrollToId("o-nas", 80);
   const handleScrollToTop = () => smoothScrollTo(0);
 
@@ -111,7 +104,7 @@ export default function Home() {
           `,
               backgroundSize: "cover",
               backgroundPosition: "center",
-              backgroundAttachment: "fixed" // Parallax efekt
+              backgroundAttachment: "fixed"
             }}
         >
           <div className="max-w-5xl mx-auto px-6 md:px-14 w-full flex flex-col items-center text-center z-10">
@@ -197,11 +190,11 @@ export default function Home() {
             </div>
             <div className="relative group">
               <div className="absolute inset-0 bg-[#c1a089] rounded-[2rem] transform translate-x-4 translate-y-4 transition duration-500 group-hover:translate-x-6 group-hover:translate-y-6"></div>
-              <div className="relative overflow-hidden rounded-[2rem] shadow-2xl">
+              <div className="relative overflow-hidden rounded-4xl shadow-2xl">
                 <img
                     src="/2.png"
                     alt="Restaurace U Janka"
-                    className="w-full h-[32rem] object-cover transform group-hover:scale-105 transition duration-700 ease-in-out"
+                    className="w-full h-128 object-cover transform group-hover:scale-105 transition duration-700 ease-in-out"
                 />
               </div>
             </div>
@@ -244,7 +237,7 @@ export default function Home() {
                           alt={item.name}
                           className="w-full h-full object-cover transform group-hover:scale-110 transition duration-700 ease-in-out"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute inset-0 bg-linear-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     <div className="p-6">
                       <h3 className="text-xl font-bold text-[#2f241d] mb-1 group-hover:text-[#c1a089] transition-colors">

@@ -1,13 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ChefHat, ChevronRight, Utensils, Info, type LucideIcon } from "lucide-react";
+import { Utensils, Info, type LucideIcon } from "lucide-react";
 import * as LucideIcons from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
 import NavHeader from "../../components/NavHeader";
 
-// ==========================================
-// FUNKCE PRO PLYNULÝ SCROLL
-// ==========================================
+
 const smoothScrollTo = (targetY: number, duration: number = 800) => {
     const startingY = window.pageYOffset;
     const diff = targetY - startingY;

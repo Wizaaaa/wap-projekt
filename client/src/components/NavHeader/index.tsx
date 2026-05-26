@@ -5,10 +5,8 @@ export default function NavHeader() {
     const location = useLocation();
     const [isScrolled, setIsScrolled] = useState(false);
 
-    // Zjistíme, jestli jsme na domovské stránce
     const isHome = location.pathname === "/" || location.pathname === "/menu";
 
-    // Pokud JSME odscrollovaní NEBO NEJSME na domovské stránce, potřebujeme tmavé prvky
     const useDarkItems = isScrolled || !isHome;
 
     useEffect(() => {
