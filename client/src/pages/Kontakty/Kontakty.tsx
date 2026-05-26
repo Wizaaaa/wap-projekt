@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Calendar, Clock, Users, Mail, MapPin, Phone, Info, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Calendar, Clock, Users, Mail, MapPin, Phone, Info, CheckCircle2, AlertTriangle, Minus, Plus } from "lucide-react";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import Footer from "../../components/Footer";
 import NavHeader from "../../components/NavHeader";
@@ -12,7 +12,7 @@ export default function Kontakty() {
     const [formData, setFormData] = useState({
         date: "",
         time: "",
-        guests: 2,
+        guests: 2, // Výchozí počet osob
         name: "",
         phone: "",
         email: "",
@@ -21,7 +21,15 @@ export default function Kontakty() {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [isError, setIsError] = useState(false);
+
+    // Stav pro chyby (objekt, abychom mohli psát konkrétní zprávy)
+    const [error, setError] = useState<{ show: boolean, message: string }>({ show: false, message: "" });
+
+    // Anti-spam ochrana na straně klienta (uloží čas posledního odeslání)
+    const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
+
+    // Získání dnešního data ve formátu YYYY-MM-DD pro omezení inputu (zákaz starých dat)
+    const todayStr = new Date().toISOString().split('T')[0];
 
     useEffect(() => {
         if (location.hash) {
@@ -37,11 +45,29 @@ export default function Kontakty() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    // Vlastní funkce pro změnu počtu hostů (hezčí UI než nativní number input)
+    const updateGuests = (change: number) => {
+        setFormData(prev => {
+            const newGuests = prev.guests + change;
+            // Zabráníme zadání nesmyslů (min 1, max třeba 30)
+            if (newGuests < 1 || newGuests > 30) return prev;
+            return { ...prev, guests: newGuests };
+        });
+    };
+
     // Skutečné odeslání do databáze
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // ANTI-SPAM: Zamezení rychlého odesílání za sebou (60 vteřin cooldown)
+        const now = Date.now();
+        if (now - lastSubmitTime < 60000) {
+            setError({ show: true, message: "Zpomalte. Další rezervaci můžete odeslat až za minutu." });
+            return;
+        }
+
         setIsSubmitting(true);
-        setIsError(false);
+        setError({ show: false, message: "" });
         setIsSuccess(false);
 
         try {
@@ -51,30 +77,32 @@ export default function Kontakty() {
                 body: JSON.stringify(formData)
             });
 
-            if (!response.ok) throw new Error("Nepodařilo se odeslat.");
+            if (!response.ok) throw new Error("Nepodařilo se odeslat na server.");
 
             setIsSuccess(true);
-            // Vyčištění formuláře po úspěšném odeslání
+            setLastSubmitTime(now); // Uložení času úspěšného odeslání
+
+            // Vyčištění formuláře po úspěšném odeslání (počet hostů necháme na 2)
             setFormData({ date: "", time: "", guests: 2, name: "", phone: "", email: "", notes: "" });
-        } catch (error) {
-            console.error("Chyba:", error);
-            setIsError(true);
+        } catch (err) {
+            console.error("Chyba:", err);
+            setError({ show: true, message: "Něco se pokazilo. Zkontrolujte připojení k internetu a zkuste to znovu." });
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <div className="bg-[#f7f0e8] min-h-screen font-sans selection:bg-[#c1a089] selection:text-white">
+        <div className="bg-[#f7f0e8] min-h-screen font-sans selection:bg-[#c1a089] selection:text-white flex flex-col">
             <NavHeader />
 
-            <main className="max-w-7xl mx-auto px-6 md:px-14 pt-36 pb-24">
+            <main className="max-w-7xl mx-auto px-6 md:px-14 pt-36 pb-24 flex-grow w-full">
 
                 <div className="text-center max-w-3xl mx-auto mb-16 animate-[fadeIn_0.5s_ease-out]">
                     <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#efe2d6] text-[#c1a089] font-bold tracking-widest uppercase text-[10px] md:text-xs mb-6 shadow-sm border border-[#e5d5c5]">
                         Váš stůl čeká
                     </span>
-                    <h1 className="text-5xl md:text-7xl font-black text-[#2f241d] leading-[1.1] mb-6">
+                    <h1 className="text-5xl md:text-7xl font-black text-[#2f241d] leading-[1.1] mb-6 tracking-tight">
                         Rezervace stolu
                     </h1>
                     <p className="text-lg md:text-xl text-[#6f6158] leading-relaxed font-light">
@@ -84,14 +112,15 @@ export default function Kontakty() {
 
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-12 xl:gap-20 items-start">
 
+                    {/* LEVÝ SLOUPEC - REZERVAČNÍ FORMULÁŘ */}
                     <div className="xl:col-span-7 relative z-10">
                         <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-[0_20px_60px_rgba(47,36,29,0.04)] border border-[#e5d5c5]/50 overflow-hidden relative">
 
-                            {/* Chybová hláška */}
-                            {isError && (
-                                <div className="absolute top-0 left-0 w-full bg-rose-50 border-b border-rose-200 p-4 text-rose-600 text-center font-bold text-sm flex items-center justify-center gap-2 animate-[slideDown_0.3s_ease]">
-                                    <AlertTriangle className="w-5 h-5" />
-                                    Něco se pokazilo. Zkuste to prosím znovu nebo nám zavolejte.
+                            {/* Vylepšená chybová hláška */}
+                            {error.show && (
+                                <div className="absolute top-0 left-0 w-full bg-rose-50 border-b border-rose-100 p-4 text-rose-700 text-center font-bold text-sm flex items-center justify-center gap-2 animate-[slideDown_0.3s_ease] z-20">
+                                    <AlertTriangle className="w-5 h-5 shrink-0" />
+                                    <span>{error.message}</span>
                                 </div>
                             )}
 
@@ -110,44 +139,86 @@ export default function Kontakty() {
                                     </p>
                                     <button
                                         onClick={() => setIsSuccess(false)}
-                                        className="px-10 py-4 bg-[#f7f0e8] text-[#2f241d] border border-[#e5d5c5] rounded-full font-bold hover:bg-[#2f241d] hover:text-white transition-colors duration-300 shadow-sm"
+                                        className="px-10 py-4 bg-[#f7f0e8] text-[#2f241d] border border-[#e5d5c5]/50 rounded-full font-bold hover:bg-[#2f241d] hover:text-white transition-colors duration-300 shadow-sm"
                                     >
-                                        Udělat další rezervaci
+                                        Nová rezervace
                                     </button>
                                 </div>
                             ) : (
                                 /* FORMULÁŘ */
-                                <form onSubmit={handleSubmit} className={`space-y-10 transition-opacity duration-300 ${isSubmitting ? "opacity-50 pointer-events-none" : "opacity-100"} pt-4`}>
+                                <form onSubmit={handleSubmit} className={`space-y-10 transition-opacity duration-300 ${isSubmitting ? "opacity-50 pointer-events-none" : "opacity-100"} ${error.show ? "pt-8" : "pt-2"}`}>
+
+                                    {/* KROK 1: Kdy a kolik */}
                                     <div className="pb-8 border-b border-[#e5d5c5]/60">
                                         <h3 className="text-2xl font-bold text-[#2f241d] mb-8 flex items-center gap-3">
                                             <span className="w-8 h-8 rounded-full bg-[#c1a089] text-white flex items-center justify-center text-sm shadow-md">1</span>
                                             Kdy dorazíte?
                                         </h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                                            {/* Datum s omezením (min={todayStr}) */}
                                             <div className="relative">
                                                 <label className="block text-xs font-bold uppercase tracking-widest text-[#9a8577] mb-2 pl-1">Datum</label>
                                                 <div className="relative">
                                                     <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#c1a089] pointer-events-none" />
-                                                    <input required name="date" value={formData.date} onChange={handleChange} type="date" className="w-full bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl pl-12 pr-4 py-4 text-[#2f241d] font-bold focus:bg-white focus:border-[#c1a089] focus:ring-4 focus:ring-[#c1a089]/20 outline-none transition-all cursor-pointer" />
+                                                    <input
+                                                        required
+                                                        name="date"
+                                                        value={formData.date}
+                                                        onChange={handleChange}
+                                                        type="date"
+                                                        min={todayStr} // TADY JE ZÁKAZ STARÝCH DAT
+                                                        className="w-full bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl pl-12 pr-4 py-4 text-[#2f241d] font-bold focus:bg-white focus:border-[#c1a089] focus:ring-4 focus:ring-[#c1a089]/20 outline-none transition-all cursor-pointer"
+                                                    />
                                                 </div>
                                             </div>
+
+                                            {/* Čas */}
                                             <div className="relative">
                                                 <label className="block text-xs font-bold uppercase tracking-widest text-[#9a8577] mb-2 pl-1">Čas</label>
                                                 <div className="relative">
                                                     <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#c1a089] pointer-events-none" />
-                                                    <input required name="time" value={formData.time} onChange={handleChange} type="time" min="11:00" max="22:00" className="w-full bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl pl-12 pr-4 py-4 text-[#2f241d] font-bold focus:bg-white focus:border-[#c1a089] focus:ring-4 focus:ring-[#c1a089]/20 outline-none transition-all cursor-pointer" />
+                                                    <input
+                                                        required
+                                                        name="time"
+                                                        value={formData.time}
+                                                        onChange={handleChange}
+                                                        type="time"
+                                                        min="11:00"
+                                                        max="22:00"
+                                                        className="w-full bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl pl-12 pr-4 py-4 text-[#2f241d] font-bold focus:bg-white focus:border-[#c1a089] focus:ring-4 focus:ring-[#c1a089]/20 outline-none transition-all cursor-pointer"
+                                                    />
                                                 </div>
                                             </div>
+
+                                            {/* Vlastní krásný UI prvek pro Počet osob */}
                                             <div className="relative">
                                                 <label className="block text-xs font-bold uppercase tracking-widest text-[#9a8577] mb-2 pl-1">Osob</label>
-                                                <div className="relative">
-                                                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#c1a089] pointer-events-none" />
-                                                    <input required name="guests" value={formData.guests} onChange={handleChange} type="number" min="1" max="50" className="w-full bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl pl-12 pr-4 py-4 text-[#2f241d] font-bold focus:bg-white focus:border-[#c1a089] focus:ring-4 focus:ring-[#c1a089]/20 outline-none transition-all" />
+                                                <div className="relative flex items-center bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl h-[58px] overflow-hidden">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => updateGuests(-1)}
+                                                        className="w-12 h-full flex items-center justify-center text-[#c1a089] hover:bg-black/5 transition-colors cursor-pointer active:bg-black/10"
+                                                    >
+                                                        <Minus className="w-5 h-5" />
+                                                    </button>
+                                                    <div className="flex-1 flex items-center justify-center font-bold text-[#2f241d] bg-white h-full border-x border-[#e5d5c5]/50">
+                                                        <Users className="w-4 h-4 text-[#c1a089] mr-2" />
+                                                        {formData.guests}
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => updateGuests(1)}
+                                                        className="w-12 h-full flex items-center justify-center text-[#c1a089] hover:bg-black/5 transition-colors cursor-pointer active:bg-black/10"
+                                                    >
+                                                        <Plus className="w-5 h-5" />
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
+                                    {/* KROK 2: Kontaktní údaje */}
                                     <div className="pb-8 border-b border-[#e5d5c5]/60">
                                         <h3 className="text-2xl font-bold text-[#2f241d] mb-8 flex items-center gap-3">
                                             <span className="w-8 h-8 rounded-full bg-[#c1a089] text-white flex items-center justify-center text-sm shadow-md">2</span>
@@ -169,10 +240,11 @@ export default function Kontakty() {
                                         </div>
                                     </div>
 
+                                    {/* TLAČÍTKO ODESLAT */}
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="w-full bg-gradient-to-r from-[#2f241d] to-[#4a3628] text-white py-5 rounded-2xl font-black text-xl hover:shadow-[0_15px_30px_rgba(47,36,29,0.3)] transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-90 disabled:hover:translate-y-0 flex justify-center items-center gap-3 overflow-hidden relative"
+                                        className="w-full bg-gradient-to-r from-[#2f241d] to-[#4a3628] text-white py-5 rounded-2xl font-black text-xl hover:shadow-[0_15px_30px_rgba(47,36,29,0.3)] transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-90 disabled:hover:translate-y-0 disabled:cursor-not-allowed flex justify-center items-center gap-3 overflow-hidden relative cursor-pointer active:scale-[0.98]"
                                     >
                                         {isSubmitting ? (
                                             <>
@@ -241,6 +313,17 @@ export default function Kontakty() {
                     </div>
                 </div>
             </main>
+
+            {/* Přidáno extra CSS pro slideDown animaci u chybové hlášky */}
+            <style>{`
+                @keyframes slideDown {
+                    from { transform: translateY(-100%); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+                .animate-\\[slideDown_0\\.3s_ease\\] {
+                    animation: slideDown 0.3s ease forwards;
+                }
+            `}</style>
 
             <Footer />
         </div>
