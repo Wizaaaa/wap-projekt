@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {
     Calendar, Clock, Users, Phone, Mail, FileText,
-    CheckCircle2, XCircle, Clock4, Search, Trash2, Eye, X, Utensils, Archive, RefreshCcw
+    CheckCircle2, XCircle, Clock4, Search, Trash2, Eye, X, Utensils, Archive, RefreshCcw, Loader2
 } from "lucide-react";
 
 type Reservation = {
@@ -22,12 +22,13 @@ export default function AdminPanel() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
-    // Nový tab "history" pro proběhlé rezervace
+    // Stav pro sledování, která rezervace se právě upravuje (pro zobrazení načítacího kolečka v tlačítku)
+    const [processingId, setProcessingId] = useState<string | null>(null);
+
     const [activeTab, setActiveTab] = useState<"all" | "new" | "confirmed" | "cancelled" | "history">("new");
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedRes, setSelectedRes] = useState<Reservation | null>(null);
 
-    // Načtení dat z API
     const fetchReservations = async (isManualRefresh = false) => {
         if (isManualRefresh) setRefreshing(true);
         try {
@@ -42,7 +43,6 @@ export default function AdminPanel() {
         }
     };
 
-    // Prvotní načtení a auto-refresh (každých 30 vteřin)
     useEffect(() => {
         fetchReservations();
         const interval = setInterval(() => fetchReservations(), 30000);
@@ -50,7 +50,9 @@ export default function AdminPanel() {
     }, []);
 
     const updateStatus = async (id: string, newStatus: string, e?: React.MouseEvent) => {
-        if (e) e.stopPropagation(); // Zabrání otevření modálu při kliknutí na rychlou akci
+        if (e) e.stopPropagation();
+
+        setProcessingId(id); // Zapneme načítání na konkrétním tlačítku
 
         try {
             await fetch(`http://localhost:3000/api/reservations/${id}/status`, {
@@ -64,21 +66,26 @@ export default function AdminPanel() {
             }
         } catch (error) {
             console.error("Chyba při úpravě", error);
+        } finally {
+            setProcessingId(null); // Vypneme načítání
         }
     };
 
     const deleteReservation = async (id: string) => {
         if (!window.confirm("Opravdu chcete tuto rezervaci trvale smazat? Tento krok nelze vrátit.")) return;
+
+        setProcessingId(id);
         try {
             await fetch(`http://localhost:3000/api/reservations/${id}`, { method: "DELETE" });
             setReservations(prev => prev.filter(res => res._id !== id));
             setSelectedRes(null);
         } catch (error) {
             console.error("Chyba při mazání", error);
+        } finally {
+            setProcessingId(null);
         }
     };
 
-    // Pomocné funkce pro datum
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -101,7 +108,6 @@ export default function AdminPanel() {
         return `${parts[2]}. ${parts[1]}. ${parts[0]}`;
     };
 
-    // Výpočet počtů do sidebaru (Historie = starší než dnešek)
     const counts = useMemo(() => {
         let n = 0, c = 0, x = 0, h = 0;
         reservations.forEach(r => {
@@ -116,9 +122,7 @@ export default function AdminPanel() {
         return { new: n, confirmed: c, cancelled: x, history: h, all: reservations.length };
     }, [reservations]);
 
-    // Filtrace a inteligentní řazení
     const processedReservations = useMemo(() => {
-        // 1. Filtrace podle Tabu a Vyhledávání
         let filtered = reservations.filter(res => {
             const isPast = isPastDate(res.date);
             const matchesSearch = res.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -126,34 +130,25 @@ export default function AdminPanel() {
                 res.email.toLowerCase().includes(searchQuery.toLowerCase());
 
             if (!matchesSearch) return false;
-
             if (activeTab === "all") return true;
             if (activeTab === "history") return isPast;
-
-            // Tab Nové, Potvrzené, Zamítnuté zobrazuje POUZE budoucí nebo dnešní
             if (isPast) return false;
             return res.status === activeTab;
         });
 
-        // 2. Řazení
         return filtered.sort((a, b) => {
             const dateA = new Date(`${a.date}T${a.time}`).getTime();
             const dateB = new Date(`${b.date}T${b.time}`).getTime();
-
-            // Historii řadíme od nejnovějších proběhlých (sestupně)
             if (activeTab === "history") return dateB - dateA;
-
-            // Nadcházející řadíme podle toho, co bude nejdřív (vzestupně)
             return dateA - dateB;
         });
     }, [reservations, activeTab, searchQuery]);
 
-
     if (loading) {
         return (
             <div className="min-h-screen bg-[#110c09] flex flex-col items-center justify-center text-[#c1a089]">
-                <div className="w-12 h-12 border-4 border-[#c1a089]/20 border-t-[#c1a089] rounded-full animate-spin mb-4"></div>
-                <p className="font-bold tracking-widest uppercase text-sm">Inicializace systému...</p>
+                <div className="w-14 h-14 border-4 border-[#c1a089]/20 border-t-[#c1a089] rounded-full animate-spin mb-6"></div>
+                <p className="font-bold tracking-[0.3em] uppercase text-sm animate-pulse">Inicializace systému...</p>
             </div>
         );
     }
@@ -162,26 +157,26 @@ export default function AdminPanel() {
         <div className="min-h-screen bg-[#f4ece3] flex font-sans text-[#2f241d] selection:bg-[#c1a089] selection:text-white">
 
             {/* TEMNÝ SIDEBAR */}
-            <aside className="w-72 bg-[#110c09] text-white flex flex-col shadow-[10px_0_30px_rgba(0,0,0,0.2)] z-20 relative">
-                <div className="p-8 border-b border-white/5 flex items-center gap-3">
-                    <div className="p-2.5 bg-gradient-to-br from-[#c1a089] to-[#9a8577] rounded-xl text-[#110c09] shadow-[0_0_15px_rgba(193,160,137,0.3)]">
+            <aside className="w-72 bg-[#110c09] text-white flex flex-col shadow-[10px_0_40px_rgba(0,0,0,0.3)] z-20 relative">
+                <div className="p-8 border-b border-white/5 flex items-center gap-4">
+                    <div className="p-3 bg-gradient-to-br from-[#c1a089] to-[#9a8577] rounded-2xl text-[#110c09] shadow-[0_0_20px_rgba(193,160,137,0.4)]">
                         <Utensils className="w-6 h-6" />
                     </div>
-                    <h1 className="text-2xl font-black tracking-tight">U Janka <span className="text-[#c1a089] font-medium text-lg">Admin</span></h1>
+                    <h1 className="text-2xl font-black tracking-tight">U Janka <br/><span className="text-[#c1a089] font-medium text-lg leading-none">Admin</span></h1>
                 </div>
 
                 <div className="p-6 flex-1 space-y-2 overflow-y-auto no-scrollbar">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/30 font-bold mb-4 ml-2 mt-2">Aktivní</p>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/30 font-bold mb-4 ml-2 mt-2">Aktivní požadavky</p>
 
                     {[
-                        { id: "new", label: "Nové požadavky", count: counts.new, icon: Clock4, color: "text-amber-400", activeBg: "bg-amber-400/10 border-amber-400/20" },
+                        { id: "new", label: "Nové", count: counts.new, icon: Clock4, color: "text-amber-400", activeBg: "bg-amber-400/10 border-amber-400/20" },
                         { id: "confirmed", label: "Potvrzeno", count: counts.confirmed, icon: CheckCircle2, color: "text-emerald-400", activeBg: "bg-emerald-400/10 border-emerald-400/20" },
                         { id: "cancelled", label: "Zamítnuto", count: counts.cancelled, icon: XCircle, color: "text-rose-400", activeBg: "bg-rose-400/10 border-rose-400/20" },
                     ].map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
-                            className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold ${
+                            className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold cursor-pointer active:scale-95 ${
                                 activeTab === tab.id
                                     ? `${tab.activeBg} text-white shadow-lg border`
                                     : "text-white/40 hover:bg-white/5 hover:text-white border border-transparent"
@@ -205,21 +200,21 @@ export default function AdminPanel() {
 
                     <button
                         onClick={() => setActiveTab("history")}
-                        className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold mb-2 ${
+                        className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold mb-2 cursor-pointer active:scale-95 ${
                             activeTab === "history" ? "bg-white/10 text-white shadow-lg border border-white/5" : "text-white/40 hover:bg-white/5 hover:text-white border border-transparent"
                         }`}
                     >
-                        <div className="flex items-center gap-3"><Archive className="w-5 h-5" /> Historie (Proběhlé)</div>
+                        <div className="flex items-center gap-3"><Archive className="w-5 h-5" /> Historie</div>
                         <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-white/5">{counts.history}</span>
                     </button>
 
                     <button
                         onClick={() => setActiveTab("all")}
-                        className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold ${
+                        className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold cursor-pointer active:scale-95 ${
                             activeTab === "all" ? "bg-white/10 text-white shadow-lg border border-white/5" : "text-white/40 hover:bg-white/5 hover:text-white border border-transparent"
                         }`}
                     >
-                        <div className="flex items-center gap-3"><Users className="w-5 h-5" /> Všechny záznamy</div>
+                        <div className="flex items-center gap-3"><Users className="w-5 h-5" /> Všechny</div>
                     </button>
                 </div>
             </aside>
@@ -228,32 +223,32 @@ export default function AdminPanel() {
             <main className="flex-1 flex flex-col h-screen overflow-hidden">
 
                 {/* TOPBAR */}
-                <header className="bg-white/80 backdrop-blur-xl px-10 py-6 shadow-[0_4px_30px_rgba(0,0,0,0.03)] border-b border-[#e5d5c5]/50 flex justify-between items-center z-10">
+                <header className="bg-white/80 backdrop-blur-xl px-10 py-6 shadow-sm border-b border-[#e5d5c5]/50 flex justify-between items-center z-10">
                     <div>
                         <h2 className="text-3xl font-black text-[#2f241d]">Správa rezervací</h2>
                         <div className="flex items-center gap-4 mt-1.5">
-                            <p className="text-[#9a8577] font-medium text-sm flex items-center gap-2">
-                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
+                            <p className="text-[#9a8577] font-bold text-xs uppercase tracking-widest flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
                                 Systém je online
                             </p>
                             <button
                                 onClick={() => fetchReservations(true)}
-                                className="flex items-center gap-1.5 text-xs font-bold text-[#c1a089] hover:text-[#2f241d] transition-colors"
+                                className="flex items-center gap-1.5 text-xs font-bold text-[#c1a089] hover:text-[#2f241d] transition-colors cursor-pointer active:scale-95 p-1 rounded-md hover:bg-[#efe2d6]"
                             >
-                                <RefreshCcw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} /> Obnovit
+                                <RefreshCcw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} /> Obnovit
                             </button>
                         </div>
                     </div>
 
                     {/* Vyhledávání */}
-                    <div className="relative w-96">
-                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#c1a089]" />
+                    <div className="relative w-[28rem] group">
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#c1a089] group-focus-within:text-[#2f241d] transition-colors" />
                         <input
                             type="text"
                             placeholder="Vyhledat zákazníka, email, telefon..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-[#f4ece3] border border-transparent rounded-full pl-14 pr-6 py-3.5 text-[#2f241d] focus:bg-white focus:ring-4 focus:ring-[#c1a089]/20 focus:border-[#c1a089] outline-none font-bold placeholder-[#9a8577] transition-all shadow-inner"
+                            className="w-full bg-[#f4ece3] border-2 border-transparent rounded-2xl pl-14 pr-6 py-4 text-[#2f241d] focus:bg-white focus:border-[#c1a089] focus:shadow-[0_10px_30px_rgba(193,160,137,0.15)] outline-none font-bold placeholder-[#9a8577] transition-all"
                         />
                     </div>
                 </header>
@@ -272,23 +267,24 @@ export default function AdminPanel() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 auto-rows-max">
                             {processedReservations.map((res) => {
                                 const todayRes = isToday(res.date);
+                                const isProcessing = processingId === res._id;
 
                                 return (
                                     <div
                                         key={res._id}
                                         onClick={() => setSelectedRes(res)}
-                                        className="bg-white rounded-3xl p-6 shadow-sm hover:shadow-[0_20px_40px_rgba(47,36,29,0.08)] border border-[#e5d5c5]/80 transition-all duration-300 group flex flex-col h-full cursor-pointer relative overflow-hidden animate-[fadeIn_0.4s_ease-out]"
+                                        className="bg-white rounded-[2rem] p-6 shadow-sm hover:shadow-[0_20px_50px_rgba(47,36,29,0.08)] border border-[#e5d5c5]/80 transition-all duration-300 group flex flex-col h-full cursor-pointer hover:-translate-y-1 relative overflow-hidden animate-[fadeIn_0.4s_ease-out]"
                                     >
-                                        {/* Barevná horní linka podle statusu */}
-                                        <div className={`absolute top-0 left-0 w-full h-1.5 ${
-                                            res.status === "new" ? "bg-amber-400" : res.status === "confirmed" ? "bg-emerald-500" : "bg-rose-500"
+                                        {/* Barevná horní linka podle statusu - udělal jsem ji silnější a svítivější */}
+                                        <div className={`absolute top-0 left-0 w-full h-2 ${
+                                            res.status === "new" ? "bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.5)]" : res.status === "confirmed" ? "bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" : "bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]"
                                         }`}></div>
 
-                                        <div className="flex justify-between items-start mb-5 pt-1">
+                                        <div className="flex justify-between items-start mb-5 pt-2">
                                             <div className="flex items-center gap-2">
                                                 {res.status === "new" && <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg text-[10px] font-black uppercase tracking-widest"><Clock4 className="w-3.5 h-3.5"/> Nové</span>}
                                                 {res.status === "confirmed" && <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg text-[10px] font-black uppercase tracking-widest"><CheckCircle2 className="w-3.5 h-3.5"/> Potvrzeno</span>}
-                                                {res.status === "cancelled" && <span className="flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-700 border border-rose-100 rounded-lg text-[10px] font-black uppercase tracking-widest"><XCircle className="w-3.5 h-3.5"/> Zrušeno</span>}
+                                                {res.status === "cancelled" && <span className="flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-700 border border-rose-100 rounded-lg text-[10px] font-black uppercase tracking-widest"><XCircle className="w-3.5 h-3.5"/> Zamítnuto</span>}
                                             </div>
                                             {/* Štítek DNES */}
                                             {todayRes && activeTab !== "history" && (
@@ -297,10 +293,10 @@ export default function AdminPanel() {
                                         </div>
 
                                         <h3 className="text-2xl font-black text-[#2f241d] mb-1 truncate group-hover:text-[#c1a089] transition-colors">{res.name}</h3>
-                                        <p className="text-sm text-[#9a8577] font-medium flex items-center gap-2 mb-5"><Phone className="w-3.5 h-3.5"/>{res.phone}</p>
+                                        <p className="text-sm text-[#9a8577] font-medium flex items-center gap-2 mb-6"><Phone className="w-4 h-4"/>{res.phone}</p>
 
-                                        {/* Info box (Datum, Čas, Osob) */}
-                                        <div className="bg-[#f4ece3]/50 rounded-2xl p-4 flex justify-between items-center border border-[#e5d5c5]/40 mt-auto mb-4 group-hover:bg-[#f4ece3] transition-colors">
+                                        {/* Info box */}
+                                        <div className="bg-[#f4ece3]/50 rounded-[1.5rem] p-4 flex justify-between items-center border border-[#e5d5c5]/40 mt-auto mb-5 group-hover:bg-[#f4ece3] transition-colors">
                                             <div className="flex flex-col items-center">
                                                 <Calendar className={`w-5 h-5 mb-1 ${todayRes ? "text-blue-500" : "text-[#c1a089]"}`} />
                                                 <span className={`font-black text-sm ${todayRes ? "text-blue-700" : "text-[#2f241d]"}`}>{formatDate(res.date)}</span>
@@ -317,20 +313,24 @@ export default function AdminPanel() {
                                             </div>
                                         </div>
 
-                                        {/* RYCHLÉ AKCE PŘÍMO NA KARTĚ (jen pro nové) */}
+                                        {/* RYCHLÉ AKCE PŘÍMO NA KARTĚ */}
                                         {res.status === "new" && activeTab !== "history" && (
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-3">
                                                 <button
                                                     onClick={(e) => updateStatus(res._id, "confirmed", e)}
-                                                    className="flex-1 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-100 py-2 rounded-xl font-bold transition-colors flex justify-center items-center gap-1 text-sm"
+                                                    disabled={isProcessing}
+                                                    className="flex-1 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-100 py-3 rounded-xl font-bold transition-all flex justify-center items-center gap-1.5 text-sm cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
-                                                    <CheckCircle2 className="w-4 h-4" /> Potvrdit
+                                                    {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                                                    Potvrdit
                                                 </button>
                                                 <button
                                                     onClick={(e) => updateStatus(res._id, "cancelled", e)}
-                                                    className="flex-1 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white border border-rose-100 py-2 rounded-xl font-bold transition-colors flex justify-center items-center gap-1 text-sm"
+                                                    disabled={isProcessing}
+                                                    className="flex-1 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white border border-rose-100 py-3 rounded-xl font-bold transition-all flex justify-center items-center gap-1.5 text-sm cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
-                                                    <XCircle className="w-4 h-4" /> Zamítnout
+                                                    {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                                                    Zamítnout
                                                 </button>
                                             </div>
                                         )}
@@ -344,82 +344,110 @@ export default function AdminPanel() {
             {/* MODÁLNÍ OKNO PRO DETAILY */}
             {selectedRes && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-[#110c09]/80 backdrop-blur-sm transition-opacity" onClick={() => setSelectedRes(null)}></div>
+                    {/* Ztmavené pozadí - silnější blur */}
+                    <div className="absolute inset-0 bg-[#110c09]/80 backdrop-blur-md transition-opacity cursor-pointer" onClick={() => setSelectedRes(null)}></div>
 
-                    <div className="bg-white rounded-[2.5rem] w-full max-w-2xl relative z-10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-[fadeIn_0.2s_ease-out]">
+                    <div className="bg-white rounded-[3rem] w-full max-w-2xl relative z-10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-[zoomIn_0.2s_ease-out] scale-100">
 
                         {/* Hlavička */}
-                        <div className="bg-[#1a120e] p-8 text-white relative">
-                            <button onClick={() => setSelectedRes(null)} className="absolute top-6 right-6 text-white/50 hover:text-white transition bg-white/5 hover:bg-white/10 p-2.5 rounded-full">
+                        <div className="bg-[#1a120e] p-10 text-white relative">
+                            <button
+                                onClick={() => setSelectedRes(null)}
+                                className="absolute top-8 right-8 text-white/50 hover:text-white bg-white/10 hover:bg-white/20 p-3 rounded-full transition-all cursor-pointer active:scale-90"
+                            >
                                 <X className="w-6 h-6" />
                             </button>
-                            <h2 className="text-4xl font-black mb-2 pr-10">{selectedRes.name}</h2>
-                            <p className="text-[#c1a089] font-medium flex items-center gap-2 text-sm"><Clock className="w-4 h-4"/> Přijato: {new Date(selectedRes.createdAt).toLocaleString("cs-CZ")}</p>
+                            <h2 className="text-4xl font-black mb-3 pr-12">{selectedRes.name}</h2>
+                            <p className="text-[#c1a089] font-bold flex items-center gap-2 text-xs uppercase tracking-widest"><Clock className="w-4 h-4"/> Přijato: {new Date(selectedRes.createdAt).toLocaleString("cs-CZ")}</p>
                         </div>
 
-                        {/* Obsah */}
-                        <div className="p-8 overflow-y-auto">
-                            <div className="grid grid-cols-3 gap-3 mb-8">
-                                <div className="bg-[#f4ece3] py-4 rounded-2xl flex flex-col items-center justify-center text-center">
-                                    <span className="text-[10px] uppercase text-[#9a8577] font-bold tracking-widest mb-1">Datum</span>
+                        {/* Obsah modálu */}
+                        <div className="p-10 overflow-y-auto">
+                            <div className="grid grid-cols-3 gap-4 mb-10">
+                                <div className="bg-[#f4ece3] py-5 rounded-3xl flex flex-col items-center justify-center text-center border border-[#e5d5c5]/50">
+                                    <span className="text-[10px] uppercase text-[#9a8577] font-bold tracking-widest mb-1.5">Datum</span>
                                     <span className={`font-black text-xl ${isToday(selectedRes.date) ? "text-blue-600" : "text-[#2f241d]"}`}>{formatDate(selectedRes.date)}</span>
                                 </div>
-                                <div className="bg-[#f4ece3] py-4 rounded-2xl flex flex-col items-center justify-center text-center">
-                                    <span className="text-[10px] uppercase text-[#9a8577] font-bold tracking-widest mb-1">Čas</span>
+                                <div className="bg-[#f4ece3] py-5 rounded-3xl flex flex-col items-center justify-center text-center border border-[#e5d5c5]/50">
+                                    <span className="text-[10px] uppercase text-[#9a8577] font-bold tracking-widest mb-1.5">Čas</span>
                                     <span className="font-black text-xl text-[#2f241d]">{selectedRes.time}</span>
                                 </div>
-                                <div className="bg-[#f4ece3] py-4 rounded-2xl flex flex-col items-center justify-center text-center">
-                                    <span className="text-[10px] uppercase text-[#9a8577] font-bold tracking-widest mb-1">Počet</span>
+                                <div className="bg-[#f4ece3] py-5 rounded-3xl flex flex-col items-center justify-center text-center border border-[#e5d5c5]/50">
+                                    <span className="text-[10px] uppercase text-[#9a8577] font-bold tracking-widest mb-1.5">Počet</span>
                                     <span className="font-black text-xl text-[#2f241d]">{selectedRes.guests} osob</span>
                                 </div>
                             </div>
 
                             <div className="space-y-6">
-                                <div className="flex items-center gap-5">
-                                    <div className="w-12 h-12 bg-white border border-[#e5d5c5] rounded-full flex items-center justify-center text-[#c1a089] shadow-sm"><Phone className="w-5 h-5"/></div>
+                                <div className="flex items-center gap-5 p-4 rounded-2xl hover:bg-[#f4ece3]/50 transition-colors">
+                                    <div className="w-14 h-14 bg-white border border-[#e5d5c5] rounded-full flex items-center justify-center text-[#c1a089] shadow-sm shrink-0"><Phone className="w-6 h-6"/></div>
                                     <div>
-                                        <p className="text-[10px] font-bold text-[#9a8577] uppercase tracking-widest mb-0.5">Telefon</p>
-                                        <a href={`tel:${selectedRes.phone}`} className="text-xl font-bold text-[#2f241d] hover:text-[#c1a089] transition">{selectedRes.phone}</a>
+                                        <p className="text-[10px] font-bold text-[#9a8577] uppercase tracking-widest mb-1">Telefon</p>
+                                        <a href={`tel:${selectedRes.phone}`} className="text-2xl font-bold text-[#2f241d] hover:text-[#c1a089] transition-colors">{selectedRes.phone}</a>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-5">
-                                    <div className="w-12 h-12 bg-white border border-[#e5d5c5] rounded-full flex items-center justify-center text-[#c1a089] shadow-sm"><Mail className="w-5 h-5"/></div>
-                                    <div>
-                                        <p className="text-[10px] font-bold text-[#9a8577] uppercase tracking-widest mb-0.5">E-mail</p>
-                                        <a href={`mailto:${selectedRes.email}`} className="text-xl font-bold text-[#2f241d] hover:text-[#c1a089] transition">{selectedRes.email}</a>
+                                <div className="flex items-center gap-5 p-4 rounded-2xl hover:bg-[#f4ece3]/50 transition-colors">
+                                    <div className="w-14 h-14 bg-white border border-[#e5d5c5] rounded-full flex items-center justify-center text-[#c1a089] shadow-sm shrink-0"><Mail className="w-6 h-6"/></div>
+                                    <div className="truncate">
+                                        <p className="text-[10px] font-bold text-[#9a8577] uppercase tracking-widest mb-1">E-mail</p>
+                                        <a href={`mailto:${selectedRes.email}`} className="text-xl font-bold text-[#2f241d] hover:text-[#c1a089] transition-colors truncate">{selectedRes.email}</a>
                                     </div>
                                 </div>
                                 {selectedRes.notes && (
-                                    <div className="mt-6 p-6 bg-amber-50 rounded-2xl border border-amber-100">
-                                        <div className="flex items-center gap-2 mb-2 text-amber-600">
+                                    <div className="mt-8 p-6 bg-amber-50 rounded-3xl border border-amber-200">
+                                        <div className="flex items-center gap-2 mb-3 text-amber-600">
                                             <FileText className="w-5 h-5"/>
                                             <p className="text-xs font-bold uppercase tracking-widest">Speciální požadavek</p>
                                         </div>
-                                        <p className="text-[#2f241d] font-bold leading-relaxed">{selectedRes.notes}</p>
+                                        <p className="text-[#2f241d] font-bold text-lg leading-relaxed">{selectedRes.notes}</p>
                                     </div>
                                 )}
                             </div>
                         </div>
 
-                        {/* Akce */}
-                        <div className="bg-gray-50 p-6 flex gap-3 border-t border-gray-200">
+                        {/* Akční Footer Modálu */}
+                        <div className="bg-gray-50 p-8 flex gap-4 border-t border-gray-200">
                             {selectedRes.status !== "confirmed" && (
-                                <button onClick={() => updateStatus(selectedRes._id, "confirmed")} className="flex-1 py-4 bg-[#2f241d] text-white rounded-xl font-black text-lg hover:bg-[#c1a089] hover:shadow-lg transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5">
-                                    <CheckCircle2 className="w-5 h-5" /> Potvrdit
+                                <button
+                                    onClick={() => updateStatus(selectedRes._id, "confirmed")}
+                                    disabled={processingId === selectedRes._id}
+                                    className="flex-1 py-4 bg-[#2f241d] text-white rounded-2xl font-black text-lg hover:bg-[#c1a089] hover:shadow-[0_15px_30px_rgba(193,160,137,0.3)] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                                >
+                                    {processingId === selectedRes._id ? <Loader2 className="w-6 h-6 animate-spin" /> : <CheckCircle2 className="w-6 h-6" />} Potvrdit
                                 </button>
                             )}
                             {selectedRes.status !== "cancelled" && (
-                                <button onClick={() => updateStatus(selectedRes._id, "cancelled")} className="flex-1 py-4 bg-white border border-[#e5d5c5] text-[#2f241d] rounded-xl font-black text-lg hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all flex items-center justify-center gap-2">
-                                    <XCircle className="w-5 h-5" /> Zamítnout
+                                <button
+                                    onClick={() => updateStatus(selectedRes._id, "cancelled")}
+                                    disabled={processingId === selectedRes._id}
+                                    className="flex-1 py-4 bg-white border border-[#e5d5c5] text-[#2f241d] rounded-2xl font-black text-lg hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                                >
+                                    {processingId === selectedRes._id ? <Loader2 className="w-6 h-6 animate-spin" /> : <XCircle className="w-6 h-6" />} Zamítnout
                                 </button>
                             )}
-                            <button onClick={() => deleteReservation(selectedRes._id)} className="w-16 flex items-center justify-center text-[#9a8577] hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors bg-white border border-[#e5d5c5]" title="Trvale smazat">
-                                <Trash2 className="w-5 h-5" />
+                            <button
+                                onClick={() => deleteReservation(selectedRes._id)}
+                                disabled={processingId === selectedRes._id}
+                                className="w-20 flex items-center justify-center text-[#9a8577] hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all cursor-pointer active:scale-90 bg-white border border-[#e5d5c5] disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Trvale smazat"
+                            >
+                                {processingId === selectedRes._id ? <Loader2 className="w-6 h-6 animate-spin" /> : <Trash2 className="w-6 h-6" />}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Vlastní animace pro Modal zjevení */}
+            <style>{`
+                @keyframes zoomIn {
+                    from { opacity: 0; transform: scale(0.95); }
+                    to { opacity: 1; transform: scale(1); }
+                }
+                .animate-\\[zoomIn_0\\.2s_ease-out\\] {
+                    animation: zoomIn 0.2s ease-out forwards;
+                }
+            `}</style>
         </div>
     );
 }
