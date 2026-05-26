@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import {
     Calendar, Clock, Users, Phone, Mail, FileText,
-    CheckCircle2, XCircle, Clock4, Search, Trash2, X, Utensils, Archive, RefreshCcw
+    CheckCircle2, XCircle, Clock4, Search, Trash2, X, Utensils, Archive, RefreshCcw, LogOut
 } from "lucide-react";
 
 type Reservation = {
@@ -17,7 +17,30 @@ type Reservation = {
     createdAt: string;
 };
 
-export default function AdminDashboard() {
+const isPastDate = (dateStr: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const rDate = new Date(dateStr);
+    rDate.setHours(0, 0, 0, 0);
+    return rDate < today;
+};
+
+const isToday = (dateStr: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const rDate = new Date(dateStr);
+    rDate.setHours(0, 0, 0, 0);
+    return rDate.getTime() === today.getTime();
+};
+
+const formatDate = (dateStr: string) => {
+    if(!dateStr) return "";
+    const parts = dateStr.split("-");
+    if(parts.length !== 3) return dateStr;
+    return `${parts[2]}. ${parts[1]}. ${parts[0]}`;
+};
+
+export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -25,74 +48,86 @@ export default function AdminDashboard() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedRes, setSelectedRes] = useState<Reservation | null>(null);
 
-    const fetchReservations = async (isManualRefresh = false) => {
+    const fetchReservations = useCallback(async (isManualRefresh = false) => {
         if (isManualRefresh) setRefreshing(true);
         try {
-            const res = await fetch("http://localhost:3000/api/reservations");
+            const token = localStorage.getItem("adminToken");
+            const res = await fetch("http://localhost:3000/api/reservations", {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                onLogout();
+                return;
+            }
+
             const data = await res.json();
             setReservations(data);
         } catch (error) {
-            console.error("Chyba při stahování rezervací", error);
+            console.error(error);
         } finally {
             setLoading(false);
             if (isManualRefresh) setTimeout(() => setRefreshing(false), 500);
         }
-    };
+    }, [onLogout]);
 
     useEffect(() => {
-        fetchReservations();
+        const loadInitialData = async () => {
+            await fetchReservations();
+        };
+
+        loadInitialData().catch(console.error);
+
         const interval = setInterval(() => fetchReservations(), 30000);
         return () => clearInterval(interval);
-    }, []);
+    }, [fetchReservations]);
 
-    const updateStatus = async (id: string, newStatus: string, e?: React.MouseEvent) => {
+    const updateStatus = async (id: string, newStatus: "new" | "confirmed" | "cancelled", e?: React.MouseEvent) => {
         if (e) e.stopPropagation();
         try {
-            await fetch(`http://localhost:3000/api/reservations/${id}/status`, {
+            const token = localStorage.getItem("adminToken");
+            const res = await fetch(`http://localhost:3000/api/reservations/${id}/status`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({ status: newStatus }),
             });
-            setReservations(prev => prev.map(res => res._id === id ? { ...res, status: newStatus as any } : res));
+
+            if (res.status === 401 || res.status === 403) {
+                onLogout();
+                return;
+            }
+
+            setReservations(prev => prev.map(res => res._id === id ? { ...res, status: newStatus } : res));
             if (selectedRes?._id === id) {
-                setSelectedRes(prev => prev ? { ...prev, status: newStatus as any } : null);
+                setSelectedRes(prev => prev ? { ...prev, status: newStatus } : null);
             }
         } catch (error) {
-            console.error("Chyba při úpravě", error);
+            console.error(error);
         }
     };
 
     const deleteReservation = async (id: string) => {
         if (!window.confirm("Opravdu chcete tuto rezervaci trvale smazat? Tento krok nelze vrátit.")) return;
         try {
-            await fetch(`http://localhost:3000/api/reservations/${id}`, { method: "DELETE" });
+            const token = localStorage.getItem("adminToken");
+            const res = await fetch(`http://localhost:3000/api/reservations/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                onLogout();
+                return;
+            }
+
             setReservations(prev => prev.filter(res => res._id !== id));
             setSelectedRes(null);
         } catch (error) {
-            console.error("Chyba při mazání", error);
+            console.error(error);
         }
-    };
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const isPastDate = (dateStr: string) => {
-        const rDate = new Date(dateStr);
-        rDate.setHours(0, 0, 0, 0);
-        return rDate < today;
-    };
-
-    const isToday = (dateStr: string) => {
-        const rDate = new Date(dateStr);
-        rDate.setHours(0, 0, 0, 0);
-        return rDate.getTime() === today.getTime();
-    };
-
-    const formatDate = (dateStr: string) => {
-        if(!dateStr) return "";
-        const parts = dateStr.split("-");
-        if(parts.length !== 3) return dateStr;
-        return `${parts[2]}. ${parts[1]}. ${parts[0]}`;
     };
 
     const counts = useMemo(() => {
@@ -110,7 +145,7 @@ export default function AdminDashboard() {
     }, [reservations]);
 
     const processedReservations = useMemo(() => {
-        let filtered = reservations.filter(res => {
+        const filtered = reservations.filter(res => {
             const isPast = isPastDate(res.date);
             const matchesSearch = res.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 res.phone.includes(searchQuery) ||
@@ -147,7 +182,7 @@ export default function AdminDashboard() {
         <div className="min-h-screen bg-[#f4ece3] flex font-sans text-[#2f241d] selection:bg-[#c1a089] selection:text-white">
             <aside className="w-72 bg-[#110c09] text-white flex flex-col shadow-[10px_0_30px_rgba(0,0,0,0.2)] z-20 relative">
                 <div className="p-8 border-b border-white/5 flex items-center gap-3">
-                    <div className="p-2.5 bg-gradient-to-br from-[#c1a089] to-[#9a8577] rounded-xl text-[#110c09] shadow-[0_0_15px_rgba(193,160,137,0.3)]">
+                    <div className="p-2.5 bg-linear-to-br from-[#c1a089] to-[#9a8577] rounded-xl text-[#110c09] shadow-[0_0_15px_rgba(193,160,137,0.3)]">
                         <Utensils className="w-6 h-6" />
                     </div>
                     <h1 className="text-2xl font-black tracking-tight">U Janka <span className="text-[#c1a089] font-medium text-lg">Admin</span></h1>
@@ -163,8 +198,7 @@ export default function AdminDashboard() {
                     ].map(tab => (
                         <button
                             key={tab.id}
-                            onClick={() => setActiveTab(tab.id as any)}
-                            className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold ${
+                            onClick={() => setActiveTab(tab.id as "new" | "confirmed" | "cancelled" | "history" | "all")}                            className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold ${
                                 activeTab === tab.id
                                     ? `${tab.activeBg} text-white shadow-lg border`
                                     : "text-white/40 hover:bg-white/5 hover:text-white border border-transparent"
@@ -204,6 +238,17 @@ export default function AdminDashboard() {
                     >
                         <div className="flex items-center gap-3"><Users className="w-5 h-5" /> Všechny záznamy</div>
                     </button>
+
+                    <div className="pt-4 border-t border-white/5 mt-auto">
+                        <button
+                            onClick={onLogout}
+                            className="w-full flex items-center gap-3 p-4 rounded-2xl transition-all duration-300 font-bold text-rose-400 hover:bg-rose-500/10 border border-transparent mt-4"
+                        >
+                            <LogOut className="w-5 h-5" />
+                            Odhlásit se
+                        </button>
+                    </div>
+
                 </div>
             </aside>
 
@@ -239,7 +284,7 @@ export default function AdminDashboard() {
                 <div className="flex-1 overflow-y-auto p-10">
                     {processedReservations.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-[#9a8577] animate-[fadeIn_0.4s_ease-out]">
-                            <div className="w-24 h-24 bg-white rounded-[2rem] flex items-center justify-center shadow-sm border border-[#e5d5c5]/50 mb-6 transform -rotate-6">
+                            <div className="w-24 h-24 bg-white rounded-4xl flex items-center justify-center shadow-sm border border-[#e5d5c5]/50 mb-6 transform -rotate-6">
                                 <Calendar className="w-10 h-10 text-[#c1a089]" />
                             </div>
                             <p className="text-2xl font-black text-[#2f241d]">Složka je prázdná</p>

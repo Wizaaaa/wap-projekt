@@ -189,7 +189,7 @@ export default function Home() {
               </Link>
             </div>
             <div className="relative group">
-              <div className="absolute inset-0 bg-[#c1a089] rounded-[2rem] transform translate-x-4 translate-y-4 transition duration-500 group-hover:translate-x-6 group-hover:translate-y-6"></div>
+              <div className="absolute inset-0 bg-[#c1a089] rounded-4xl transform translate-x-4 translate-y-4 transition duration-500 group-hover:translate-x-6 group-hover:translate-y-6"></div>
               <div className="relative overflow-hidden rounded-4xl shadow-2xl">
                 <img
                     src="/2.png"

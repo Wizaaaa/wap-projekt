@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const verifyToken = require('../middleware/auth');
 const {
     getReservations,
     createReservation,
@@ -7,10 +8,10 @@ const {
     deleteReservation
 } = require('../controllers/Reservations');
 
-router.get('/', getReservations);
 router.post('/', createReservation);
 
-router.patch('/:id/status', updateReservationStatus);
-router.delete('/:id', deleteReservation);
+router.get('/', verifyToken, getReservations);
+router.patch('/:id/status', verifyToken, updateReservationStatus);
+router.delete('/:id', verifyToken, deleteReservation);
 
 module.exports = router;
