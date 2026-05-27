@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { Calendar, Clock, Users, Mail, MapPin, Phone, Info, CheckCircle2, AlertTriangle, Minus, Plus } from "lucide-react";
-import { FaInstagram, FaFacebook } from "react-icons/fa";
+import { Calendar, Clock, Users, Mail, Phone, Info, CheckCircle2, AlertTriangle, Minus, Plus } from "lucide-react";
 import Footer from "../../components/Footer";
 import NavHeader from "../../components/NavHeader";
 
 export default function Kontakty() {
     const location = useLocation();
 
-    // Reálné stavy pro formulář
     const [formData, setFormData] = useState({
         date: "",
         time: "",
-        guests: 2, // Výchozí počet osob
+        guests: 2,
         name: "",
         phone: "",
         email: "",
@@ -22,13 +20,10 @@ export default function Kontakty() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
-    // Stav pro chyby (objekt, abychom mohli psát konkrétní zprávy)
     const [error, setError] = useState<{ show: boolean, message: string }>({ show: false, message: "" });
 
-    // Anti-spam ochrana na straně klienta (uloží čas posledního odeslání)
     const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
 
-    // Získání dnešního data ve formátu YYYY-MM-DD pro omezení inputu (zákaz starých dat)
     const todayStr = new Date().toISOString().split('T')[0];
 
     useEffect(() => {
@@ -45,21 +40,17 @@ export default function Kontakty() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Vlastní funkce pro změnu počtu hostů (hezčí UI než nativní number input)
     const updateGuests = (change: number) => {
         setFormData(prev => {
             const newGuests = prev.guests + change;
-            // Zabráníme zadání nesmyslů (min 1, max třeba 30)
             if (newGuests < 1 || newGuests > 30) return prev;
             return { ...prev, guests: newGuests };
         });
     };
 
-    // Skutečné odeslání do databáze
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // ANTI-SPAM: Zamezení rychlého odesílání za sebou (60 vteřin cooldown)
         const now = Date.now();
         if (now - lastSubmitTime < 60000) {
             setError({ show: true, message: "Zpomalte. Další rezervaci můžete odeslat až za minutu." });
@@ -77,15 +68,18 @@ export default function Kontakty() {
                 body: JSON.stringify(formData)
             });
 
-            if (!response.ok) throw new Error("Nepodařilo se odeslat na server.");
+            if (!response.ok) {
+                console.error("Chyba serveru: odpověď není OK.");
+                setError({ show: true, message: "Něco se pokazilo. Zkuste to prosím znovu." });
+                return;
+            }
 
             setIsSuccess(true);
-            setLastSubmitTime(now); // Uložení času úspěšného odeslání
-
-            // Vyčištění formuláře po úspěšném odeslání (počet hostů necháme na 2)
+            setLastSubmitTime(now);
             setFormData({ date: "", time: "", guests: 2, name: "", phone: "", email: "", notes: "" });
+
         } catch (err) {
-            console.error("Chyba:", err);
+            console.error("Síťová chyba:", err);
             setError({ show: true, message: "Něco se pokazilo. Zkontrolujte připojení k internetu a zkuste to znovu." });
         } finally {
             setIsSubmitting(false);
@@ -96,7 +90,7 @@ export default function Kontakty() {
         <div className="bg-[#f7f0e8] min-h-screen font-sans selection:bg-[#c1a089] selection:text-white flex flex-col">
             <NavHeader />
 
-            <main className="max-w-7xl mx-auto px-6 md:px-14 pt-36 pb-24 flex-grow w-full">
+            <main className="max-w-7xl mx-auto px-6 md:px-14 pt-36 pb-24 grow w-full">
 
                 <div className="text-center max-w-3xl mx-auto mb-16 animate-[fadeIn_0.5s_ease-out]">
                     <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#efe2d6] text-[#c1a089] font-bold tracking-widest uppercase text-[10px] md:text-xs mb-6 shadow-sm border border-[#e5d5c5]">
@@ -167,7 +161,7 @@ export default function Kontakty() {
                                                         value={formData.date}
                                                         onChange={handleChange}
                                                         type="date"
-                                                        min={todayStr} // TADY JE ZÁKAZ STARÝCH DAT
+                                                        min={todayStr}
                                                         className="w-full bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl pl-12 pr-4 py-4 text-[#2f241d] font-bold focus:bg-white focus:border-[#c1a089] focus:ring-4 focus:ring-[#c1a089]/20 outline-none transition-all cursor-pointer"
                                                     />
                                                 </div>
@@ -194,7 +188,7 @@ export default function Kontakty() {
                                             {/* Vlastní krásný UI prvek pro Počet osob */}
                                             <div className="relative">
                                                 <label className="block text-xs font-bold uppercase tracking-widest text-[#9a8577] mb-2 pl-1">Osob</label>
-                                                <div className="relative flex items-center bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl h-[58px] overflow-hidden">
+                                                <div className="relative flex items-center bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl h-14.5 overflow-hidden">
                                                     <button
                                                         type="button"
                                                         onClick={() => updateGuests(-1)}
@@ -244,7 +238,7 @@ export default function Kontakty() {
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="w-full bg-gradient-to-r from-[#2f241d] to-[#4a3628] text-white py-5 rounded-2xl font-black text-xl hover:shadow-[0_15px_30px_rgba(47,36,29,0.3)] transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-90 disabled:hover:translate-y-0 disabled:cursor-not-allowed flex justify-center items-center gap-3 overflow-hidden relative cursor-pointer active:scale-[0.98]"
+                                        className="w-full bg-linear-to-r from-[#2f241d] to-[#4a3628] text-white py-5 rounded-2xl font-black text-xl hover:shadow-[0_15px_30px_rgba(47,36,29,0.3)] transition-all duration-300 transform hover:-translate-y-1 disabled:opacity-90 disabled:hover:translate-y-0 disabled:cursor-not-allowed flex justify-center items-center gap-3 overflow-hidden relative cursor-pointer active:scale-[0.98]"
                                     >
                                         {isSubmitting ? (
                                             <>
@@ -269,7 +263,7 @@ export default function Kontakty() {
 
                     {/* PRAVÝ SLOUPEC - KONTAKTY */}
                     <div className="xl:col-span-5 space-y-8 lg:sticky lg:top-32">
-                        <div className="bg-[#efe2d6] rounded-[2rem] p-8 shadow-sm border border-[#e5d5c5]/50 hover:shadow-lg transition duration-500">
+                        <div className="bg-[#efe2d6] rounded-4xl p-8 shadow-sm border border-[#e5d5c5]/50 hover:shadow-lg transition duration-500">
                             <h3 className="text-2xl font-black text-[#2f241d] mb-6">Máte speciální přání?</h3>
                             <div className="space-y-4">
                                 <a href="tel:+420731405866" className="flex items-center gap-5 p-5 bg-white rounded-2xl hover:shadow-md hover:-translate-y-1 transition-all duration-300 group">
@@ -293,7 +287,7 @@ export default function Kontakty() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-[#e5d5c5]/50">
+                        <div className="bg-white rounded-4xl p-8 shadow-sm border border-[#e5d5c5]/50">
                             <h3 className="text-2xl font-black text-[#2f241d] mb-6">Otevírací doba</h3>
                             <div className="space-y-4 text-lg">
                                 <div className="flex justify-between items-center pb-4 border-b border-[#e5d5c5]/50">
@@ -314,7 +308,6 @@ export default function Kontakty() {
                 </div>
             </main>
 
-            {/* Přidáno extra CSS pro slideDown animaci u chybové hlášky */}
             <style>{`
                 @keyframes slideDown {
                     from { transform: translateY(-100%); opacity: 0; }

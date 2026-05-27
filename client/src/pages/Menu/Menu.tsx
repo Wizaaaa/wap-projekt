@@ -1,32 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Utensils, Info, type LucideIcon } from "lucide-react";
+import { smoothScrollTo } from "../../utils/scrollUtils.ts";
 import * as LucideIcons from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer";
 import NavHeader from "../../components/NavHeader";
-
-
-const smoothScrollTo = (targetY: number, duration: number = 800) => {
-    const startingY = window.pageYOffset;
-    const diff = targetY - startingY;
-    let start: number | null = null;
-
-    const easing = (t: number) => (--t) * t * t + 1;
-
-    const step = (timestamp: number) => {
-        if (!start) start = timestamp;
-        const time = timestamp - start;
-        const percent = easing(Math.min(time / duration, 1));
-
-        window.scrollTo(0, startingY + diff * percent);
-
-        if (time < duration) {
-            window.requestAnimationFrame(step);
-        }
-    };
-
-    window.requestAnimationFrame(step);
-};
 
 // ==========================================
 // TYPOVÁNÍ
@@ -157,7 +135,6 @@ export default function Menu() {
             });
     }, []);
 
-    // 2. Řešení navigace z dropdown menu (hash v URL)
     useEffect(() => {
         if (loading) return;
 
@@ -171,6 +148,8 @@ export default function Menu() {
         };
 
         const targetTab = determineTab(hash);
+
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveTab(targetTab);
 
         if (hash && !["jidlo", "dezerty", "piti"].includes(hash)) {
@@ -187,14 +166,12 @@ export default function Menu() {
         }
     }, [location.hash, loading, menuSections]);
 
-    // 3. Zobrazení tlačítka pro scroll nahoru
     useEffect(() => {
         const handleScroll = () => setShowScrollTop(window.scrollY > 400);
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    // 4. Přetvoření sekcí s ikonkami
     const transformSectionsWithIcons = (sections: DBMenuSection[]) => {
         return sections.map((section) => {
             const iconName = section.icon as keyof typeof LucideIcons;
@@ -214,7 +191,6 @@ export default function Menu() {
         { id: "dezerty", name: "Dezerty" }
     ];
 
-    // 5. Filtrace sekcí na základě vybraného tabu
     const filteredSections = useMemo(() => {
         const foodSections = menuSections.filter(s => s.type === "food");
         const drinkSections = menuSections.filter(s => s.type === "drink");
@@ -288,7 +264,7 @@ export default function Menu() {
                 </div>
             </div>
 
-            {/* VÝPIS JÍDEL (Zde se střídá SKELETON a REÁLNÁ DATA) */}
+            {/* VÝPIS JÍDEL */}
             <div className="max-w-5xl mx-auto px-6 md:px-14 pt-8 pb-32 relative z-10 min-h-[60vh]">
                 {loading ? (
                     // SKELETON LOADER
@@ -297,7 +273,6 @@ export default function Menu() {
                         <MenuSkeleton />
                     </div>
                 ) : (
-                    // REÁLNÁ DATA
                     <div key={activeTab} className="space-y-12 animate-[fadeIn_0.4s_ease-out]">
                         {filteredSections.length > 0 ? (
                             filteredSections.map((section) => (

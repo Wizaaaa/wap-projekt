@@ -93,7 +93,7 @@ export default function AdminLogin({ onLogin }: { onLogin: () => void }) {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-[#2f241d] hover:bg-[#c1a089] text-white font-black text-lg py-4 px-4 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(193,160,137,0.3)] mt-2 flex justify-center items-center disabled:opacity-70 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
+                        className="w-full bg-[#2f241d] hover:bg-[#c1a089] text-white font-black text-lg py-4 px-4 rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(193,160,137,0.3)] mt-2 flex justify-center items-center disabled:opacity-70 disabled:hover:translate-y-0 disabled:cursor-not-allowed cursor-pointer"
                     >
                         {isLoading ? (
                             <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>

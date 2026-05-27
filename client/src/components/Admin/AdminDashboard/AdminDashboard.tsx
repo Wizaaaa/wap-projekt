@@ -200,8 +200,8 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as "new" | "confirmed" | "cancelled" | "history" | "all")}                            className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold ${
                                 activeTab === tab.id
-                                    ? `${tab.activeBg} text-white shadow-lg border`
-                                    : "text-white/40 hover:bg-white/5 hover:text-white border border-transparent"
+                                    ? `${tab.activeBg} text-white shadow-lg border cursor-pointer`
+                                    : "text-white/40 hover:bg-white/5 hover:text-white border border-transparent cursor-pointer"
                             }`}
                         >
                             <div className="flex items-center gap-3">
@@ -222,7 +222,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
                     <button
                         onClick={() => setActiveTab("history")}
-                        className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold mb-2 ${
+                        className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold mb-2 cursor-pointer ${
                             activeTab === "history" ? "bg-white/10 text-white shadow-lg border border-white/5" : "text-white/40 hover:bg-white/5 hover:text-white border border-transparent"
                         }`}
                     >
@@ -232,7 +232,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
                     <button
                         onClick={() => setActiveTab("all")}
-                        className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold ${
+                        className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 font-bold cursor-pointer ${
                             activeTab === "all" ? "bg-white/10 text-white shadow-lg border border-white/5" : "text-white/40 hover:bg-white/5 hover:text-white border border-transparent"
                         }`}
                     >
@@ -242,7 +242,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                     <div className="pt-4 border-t border-white/5 mt-auto">
                         <button
                             onClick={onLogout}
-                            className="w-full flex items-center gap-3 p-4 rounded-2xl transition-all duration-300 font-bold text-rose-400 hover:bg-rose-500/10 border border-transparent mt-4"
+                            className="w-full flex items-center gap-3 p-4 rounded-2xl transition-all duration-300 font-bold text-rose-400 hover:bg-rose-500/10 border border-transparent mt-4 cursor-pointer"
                         >
                             <LogOut className="w-5 h-5" />
                             Odhlásit se
@@ -263,7 +263,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                             </p>
                             <button
                                 onClick={() => fetchReservations(true)}
-                                className="flex items-center gap-1.5 text-xs font-bold text-[#c1a089] hover:text-[#2f241d] transition-colors"
+                                className="flex items-center gap-1.5 text-xs font-bold text-[#c1a089] hover:text-[#2f241d] transition-colors cursor-pointer"
                             >
                                 <RefreshCcw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} /> Obnovit
                             </button>
