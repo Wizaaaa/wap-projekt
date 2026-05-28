@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 
 export default function NavHeader() {
     const location = useLocation();
     const [isScrolled, setIsScrolled] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const isHome = location.pathname === "/" || location.pathname === "/menu";
 
@@ -16,6 +18,11 @@ export default function NavHeader() {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    /* eslint-disable react-hooks/set-state-in-effect */
+    useLayoutEffect(() => {
+        setIsMenuOpen(false);
+    }, [location.pathname]);
 
     const isActive = (path: string) => location.pathname === path;
     const isMenuPath = location.pathname.includes("/menu");
@@ -46,9 +53,9 @@ export default function NavHeader() {
                     />
                 </Link>
 
-                {/* Navigace */}
-                <div className="flex items-center gap-6 md:gap-10">
-                    <nav className="hidden sm:flex items-center gap-8 text-base md:text-lg font-semibold">
+                {/* Navigace Desktopová */}
+                <div className="hidden lg:flex items-center gap-6 md:gap-10">
+                    <nav className="flex items-center gap-8 text-base md:text-lg font-semibold">
 
                         {/* DOMŮ */}
                         <Link
@@ -60,7 +67,7 @@ export default function NavHeader() {
                             }`}
                         >
                             Domů
-                            <span className={`absolute -bottom-1 left-0 h-[2px] transition-all duration-300 ${
+                            <span className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-300 ${
                                 isActive("/") ? "w-full bg-[#c1a089]" : "w-0 bg-[#c1a089] group-hover:w-full"
                             }`}></span>
                         </Link>
@@ -76,7 +83,7 @@ export default function NavHeader() {
                             }`}
                         >
                             Galerie
-                            <span className={`absolute -bottom-1 left-0 h-[2px] transition-all duration-300 ${
+                            <span className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-300 ${
                                 isActive("/galerie") ? "w-full bg-[#c1a089]" : "w-0 bg-[#c1a089] group-hover:w-full"
                             }`}></span>
                         </Link>
@@ -95,7 +102,7 @@ export default function NavHeader() {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mt-1 transition-transform group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                                 </svg>
-                                <span className={`absolute bottom-1 left-0 h-[2px] transition-all duration-300 ${
+                                <span className={`absolute bottom-1 left-0 h-0.5 transition-all duration-300 ${
                                     isMenuPath ? "w-full bg-[#c1a089]" : "w-0 bg-[#c1a089] group-hover:w-full"
                                 }`}></span>
                             </Link>
@@ -115,10 +122,10 @@ export default function NavHeader() {
                         </div>
                     </nav>
 
-                    {/* CTA Rezervace */}
+                    {/* CTA Rezervace - desktop */}
                     <Link
                         to="/kontakt"
-                        className={`px-6 py-2.5 md:px-8 md:py-3 rounded-full font-bold text-sm md:text-base transition-all duration-300 transform hover:-translate-y-0.5 ${
+                        className={`px-4 py-2 md:px-8 md:py-3 rounded-full font-bold text-sm md:text-base transition-all duration-300 transform hover:-translate-y-0.5 ${
                             isActive("/kontakt")
                                 ? "bg-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.3)]"
                                 : useDarkItems
@@ -129,7 +136,100 @@ export default function NavHeader() {
                         Rezervace
                     </Link>
                 </div>
+
+                {/* Mobilní prvky */}
+                <div className="flex lg:hidden items-center gap-4">
+                    <Link
+                        to="/kontakt"
+                        className={`px-4 py-2 rounded-full font-bold text-sm transition-all duration-300 transform hover:-translate-y-0.5 ${
+                            isActive("/kontakt")
+                                ? "bg-emerald-600 text-white shadow-[0_4px_20px_rgba(16,185,129,0.3)]"
+                                : useDarkItems
+                                    ? "bg-[#2f241d] text-white hover:bg-emerald-600 hover:shadow-[0_4px_20px_rgba(16,185,129,0.3)]"
+                                    : "bg-white text-[#2f241d] hover:bg-emerald-600 hover:text-white hover:shadow-[0_4px_20px_rgba(16,185,129,0.3)]"
+                        }`}
+                    >
+                        Rezervace
+                    </Link>
+
+                    <button
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className={`p-2.5 rounded-lg transition-colors cursor-pointer ${
+                            useDarkItems
+                                ? "text-[#2f241d] hover:bg-[#efe2d6]"
+                                : "text-white hover:bg-white/10"
+                        }`}
+                    >
+                        {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                    </button>
+                </div>
             </div>
+
+            {/* Mobilní menu */}
+            {isMenuOpen && (
+                <div className="lg:hidden fixed top-20 left-0 right-0 bg-[#f7f0e8]/95 backdrop-blur-md border-b border-[#e5d5c5] shadow-lg animate-in slide-in-from-top">
+                    <nav className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-4">
+
+                        {/* Domů */}
+                        <Link
+                            to="/"
+                            className={`px-4 py-3 rounded-lg font-semibold transition-colors ${
+                                isActive("/")
+                                    ? "bg-[#c1a089]/10 text-[#2f241d]"
+                                    : "text-[#6f6158] hover:bg-[#efe2d6] hover:text-[#2f241d]"
+                            }`}
+                        >
+                            Domů
+                        </Link>
+
+                        {/* Galerie */}
+                        <Link
+                            to="/galerie"
+                            className={`px-4 py-3 rounded-lg font-semibold transition-colors ${
+                                isActive("/galerie")
+                                    ? "bg-[#c1a089]/10 text-[#2f241d]"
+                                    : "text-[#6f6158] hover:bg-[#efe2d6] hover:text-[#2f241d]"
+                            }`}
+                        >
+                            Galerie
+                        </Link>
+
+                        {/* Menu */}
+                        <Link
+                            to="/menu"
+                            className={`px-4 py-3 rounded-lg font-semibold transition-colors ${
+                                isMenuPath
+                                    ? "bg-[#c1a089]/10 text-[#2f241d]"
+                                    : "text-[#6f6158] hover:bg-[#efe2d6] hover:text-[#2f241d]"
+                            }`}
+                        >
+                            Menu
+                        </Link>
+
+                        {/* Submenu - Menu volby */}
+                        <div className="pl-4 flex flex-col gap-2 border-l-2 border-[#c1a089]/30">
+                            <Link
+                                to="/menu#hlavni-jidla"
+                                className="px-4 py-2 text-sm text-[#6f6158] hover:text-[#2f241d] hover:bg-[#efe2d6] rounded transition-colors"
+                            >
+                                Hlavní jídla
+                            </Link>
+                            <Link
+                                to="/menu#speciality"
+                                className="px-4 py-2 text-sm text-[#6f6158] hover:text-[#2f241d] hover:bg-[#efe2d6] rounded transition-colors"
+                            >
+                                Speciality
+                            </Link>
+                            <Link
+                                to="/menu#napoje"
+                                className="px-4 py-2 text-sm text-[#6f6158] hover:text-[#2f241d] hover:bg-[#efe2d6] rounded transition-colors"
+                            >
+                                Nápoje
+                            </Link>
+                        </div>
+                    </nav>
+                </div>
+            )}
         </header>
     );
 }

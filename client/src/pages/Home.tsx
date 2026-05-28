@@ -207,7 +207,7 @@ export default function Home() {
             {/* Dekorativní prvek do pozadí */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#f7f0e8] rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2"></div>
 
-            <div className="relative z-10 flex flex-col md:flex-row justify-between items-end mb-12">
+            <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
               <div>
                 <span className="text-[#c1a089] font-bold tracking-widest uppercase text-sm mb-2 block">Naše pýcha</span>
                 <h2 className="text-4xl md:text-5xl font-black text-[#2f241d]">

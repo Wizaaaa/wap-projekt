@@ -15,7 +15,7 @@ const authRouter = require('./routes/auth');
 const app = express();
 
 mongoose
-    .connect("mongodb+srv://admin:ujankaadmin@ujanka.vjb8ymh.mongodb.net/UJankaDatabaze?appName=UJanka")
+    .connect(process.env.MONGODB)
     .then(() => console.log("Databaze pripojena"))
     .catch((err) => console.log(err));
 
