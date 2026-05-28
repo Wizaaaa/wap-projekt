@@ -308,6 +308,38 @@ export default function Kontakty() {
                 </div>
             </main>
 
+            {/* GOOGLE MAPA */}
+            <section className="px-6 md:px-14 pb-20">
+                <div className="max-w-7xl mx-auto">
+                    <div className="bg-white rounded-[2.5rem] p-4 md:p-6 shadow-[0_20px_60px_rgba(47,36,29,0.04)] border border-[#e5d5c5]/50">
+                        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6 px-2 md:px-3 pt-2">
+                            <div>
+                                <span className="text-[#c1a089] font-bold tracking-widest uppercase text-xs mb-2 block">Najdete nás zde</span>
+                                <h2 className="text-3xl md:text-4xl font-black text-[#2f241d]">Kde nás najdete?</h2>
+                            </div>
+                            <a
+                                href="https://www.google.com/maps/place/U+Janka/@50.4374137,14.9264144,21z/data=!4m15!1m8!3m7!1s0x47095445597e174f:0xd66f2814823b48b0!2sKarla+Vesel%C3%A9ho+795,+293+06+Kosmonosy!3b1!8m2!3d50.4373771!4d14.9267005!16s%2Fg%2F11csn10dgm!3m5!1s0x470955f3f22eee81:0x2db3a148caa94267!8m2!3d50.4373771!4d14.9267005!16s%2Fg%2F11fd6mxg8f?entry=ttu&g_ep=EgoyMDI2MDUyMC4wIKXMDSoASAFQAw%3D%3D"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-[#2f241d] text-white font-bold hover:bg-[#4a3628] transition-colors duration-300"
+                            >
+                                Otevřít v Google Maps
+                            </a>
+                        </div>
+
+                        <div className="overflow-hidden rounded-4xl border border-[#e5d5c5]/60 bg-[#f7f0e8]">
+                            <iframe
+                                title="Google mapa - Restaurace U Janka"
+                                src="https://www.google.com/maps?q=Karla+Vesel%C3%A9ho+795,+293+06+Kosmonosy&z=18&output=embed"
+                                className="w-full h-90 md:h-130"
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                            ></iframe>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <style>{`
                 @keyframes slideDown {
                     from { transform: translateY(-100%); opacity: 0; }
