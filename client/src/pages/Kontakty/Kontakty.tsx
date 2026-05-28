@@ -37,6 +37,12 @@ export default function Kontakty() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
+        if (name === "phone") {
+            const onlyDigits = value.replace(/\D/g, "").slice(0, 9);
+            setFormData(prev => ({ ...prev, [name]: onlyDigits }));
+            return;
+        }
+
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
@@ -50,6 +56,11 @@ export default function Kontakty() {
 
     const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (formData.phone.length !== 9) {
+            setError({ show: true, message: "Telefonní číslo musí mít přesně 9 číslic." });
+            return;
+        }
 
         const now = Date.now();
         if (now - lastSubmitTime < 60000) {
@@ -223,7 +234,7 @@ export default function Kontakty() {
                                                 <input required name="name" value={formData.name} onChange={handleChange} type="text" placeholder="Jméno a příjmení" className="w-full bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl px-5 py-4 text-[#2f241d] font-medium placeholder-[#9a8577] focus:bg-white focus:border-[#c1a089] focus:ring-4 focus:ring-[#c1a089]/20 outline-none transition-all" />
                                             </div>
                                             <div>
-                                                <input required name="phone" value={formData.phone} onChange={handleChange} type="tel" placeholder="Telefonní číslo" className="w-full bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl px-5 py-4 text-[#2f241d] font-medium placeholder-[#9a8577] focus:bg-white focus:border-[#c1a089] focus:ring-4 focus:ring-[#c1a089]/20 outline-none transition-all" />
+                                                <input required name="phone" value={formData.phone} onChange={handleChange} type="tel" inputMode="numeric" minLength={9} maxLength={9} pattern="[0-9]{9}" placeholder="Telefonní číslo" className="w-full bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl px-5 py-4 text-[#2f241d] font-medium placeholder-[#9a8577] focus:bg-white focus:border-[#c1a089] focus:ring-4 focus:ring-[#c1a089]/20 outline-none transition-all" />
                                             </div>
                                             <div className="md:col-span-2">
                                                 <input required name="email" value={formData.email} onChange={handleChange} type="email" placeholder="E-mail (pro potvrzení)" className="w-full bg-[#f7f0e8] border border-[#e5d5c5]/50 rounded-2xl px-5 py-4 text-[#2f241d] font-medium placeholder-[#9a8577] focus:bg-white focus:border-[#c1a089] focus:ring-4 focus:ring-[#c1a089]/20 outline-none transition-all" />

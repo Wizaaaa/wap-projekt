@@ -30,10 +30,10 @@ export default function Footer() {
                                 Restaurace s dlouholetou tradicí, která se zaměřuje na kvalitní a chutnou českou kuchyni. Vaříme srdcem a z poctivých surovin.
                             </p>
                             <div className="flex gap-4 pt-4">
-                                <a href="https://www.instagram.com/u_janka_restaurace/" className="p-2.5 rounded-2xl bg-[#3e2b1f] border border-[#4a3628] hover:bg-[#f4a261] hover:text-[#2c1e16] hover:-translate-y-1 transition-all duration-300">
+                                <a href="https://www.instagram.com/u_janka_restaurace/" target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-2xl bg-[#3e2b1f] border border-[#4a3628] hover:bg-[#f4a261] hover:text-[#2c1e16] hover:-translate-y-1 transition-all duration-300">
                                     <FaInstagram className="w-5 h-5" />
                                 </a>
-                                <a href="https://www.facebook.com/p/Restaurace-U-Janka-100090712841566/" className="p-2.5 rounded-2xl bg-[#3e2b1f] border border-[#4a3628] hover:bg-[#f4a261] hover:text-[#2c1e16] hover:-translate-y-1 transition-all duration-300">
+                                <a href="https://www.facebook.com/p/Restaurace-U-Janka-100090712841566/" target="_blank" rel="noopener noreferrer" className="p-2.5 rounded-2xl bg-[#3e2b1f] border border-[#4a3628] hover:bg-[#f4a261] hover:text-[#2c1e16] hover:-translate-y-1 transition-all duration-300">
                                     <FaFacebook className="w-5 h-5" />
                                 </a>
                             </div>

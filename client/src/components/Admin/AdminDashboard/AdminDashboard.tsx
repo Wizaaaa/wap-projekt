@@ -417,16 +417,16 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
                         <div className="bg-gray-50 p-6 flex gap-3 border-t border-gray-200">
                             {selectedRes.status !== "confirmed" && (
-                                <button onClick={() => updateStatus(selectedRes._id, "confirmed")} className="flex-1 py-4 bg-[#2f241d] text-white rounded-xl font-black text-lg hover:bg-[#c1a089] hover:shadow-lg transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5">
+                                <button onClick={() => updateStatus(selectedRes._id, "confirmed")} className="flex-1 py-4 bg-[#2f241d] text-white rounded-xl font-black text-lg hover:bg-[#c1a089] hover:shadow-lg transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5 cursor-pointer">
                                     <CheckCircle2 className="w-5 h-5" /> Potvrdit
                                 </button>
                             )}
                             {selectedRes.status !== "cancelled" && (
-                                <button onClick={() => updateStatus(selectedRes._id, "cancelled")} className="flex-1 py-4 bg-white border border-[#e5d5c5] text-[#2f241d] rounded-xl font-black text-lg hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all flex items-center justify-center gap-2">
+                                <button onClick={() => updateStatus(selectedRes._id, "cancelled")} className="flex-1 py-4 bg-white border border-[#e5d5c5] text-[#2f241d] rounded-xl font-black text-lg hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all flex items-center justify-center gap-2 cursor-pointer">
                                     <XCircle className="w-5 h-5" /> Zamítnout
                                 </button>
                             )}
-                            <button onClick={() => deleteReservation(selectedRes._id)} className="w-16 flex items-center justify-center text-[#9a8577] hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors bg-white border border-[#e5d5c5]" title="Trvale smazat">
+                            <button onClick={() => deleteReservation(selectedRes._id)} className="w-16 flex items-center justify-center text-[#9a8577] hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors bg-white border border-[#e5d5c5] cursor-pointer" title="Trvale smazat">
                                 <Trash2 className="w-5 h-5" />
                             </button>
                         </div>
