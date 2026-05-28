@@ -46,13 +46,13 @@ export default function Footer() {
 
                             <ul className="space-y-4">
                                 <li>
-                                    <a href="#" className="group flex items-center text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300">
+                                    <Link to="/menu" className="group flex items-center text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300">
                                         <ArrowRight className="w-4 h-4 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 mr-2" />
                                         <span className="transform group-hover:translate-x-1 transition-transform duration-300">Alergeny</span>
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
-                                    <a href="#" className="group flex items-center text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300">
+                                    <a href="/galerie" className="group flex items-center text-[#c2b29f] hover:text-[#f4a261] transition-colors duration-300">
                                         <ArrowRight className="w-4 h-4 opacity-0 -ml-5 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300 mr-2" />
                                         <span className="transform group-hover:translate-x-1 transition-transform duration-300">Zázemí</span>
                                     </a>
