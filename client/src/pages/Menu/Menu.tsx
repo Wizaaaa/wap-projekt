@@ -75,11 +75,62 @@ const MenuSectionGroup = React.memo(({ section }: { section: DBMenuSection }) =>
 ));
 
 // ==========================================
-// SKELETON LOADER (Tuff načítání)
+// SEZNAM ALERGENŮ
+// ==========================================
+const AllergensInfo = React.memo(() => {
+    const allergens = [
+        { id: "1", name: "Obiloviny obsahující lepek" },
+        { id: "2", name: "Korýši a výrobky z nich" },
+        { id: "3", name: "Vejce a výrobky z nich" },
+        { id: "4", name: "Ryby a výrobky z nich" },
+        { id: "5", name: "Jádra podzemnice olejné (arašídy)" },
+        { id: "6", name: "Sójové boby (sója)" },
+        { id: "7", name: "Mléko a výrobky z něj" },
+        { id: "8", name: "Skořápkové plody (ořechy)" },
+        { id: "9", name: "Celer a výrobky z něj" },
+        { id: "10", name: "Hořčice a výrobky z ní" },
+        { id: "11", name: "Sezamová semena" },
+        { id: "12", name: "Oxid siřičitý a siřičitany" },
+        { id: "13", name: "Vlčí bob (lupina)" },
+        { id: "14", name: "Měkkýši a výrobky z nich" },
+    ];
+
+    return (
+        <div className="bg-white rounded-[2.5rem] p-6 md:p-10 shadow-[0_10px_40px_rgba(47,36,29,0.03)] border border-[#e5d5c5]/40 mt-12 transition-shadow duration-500 hover:shadow-[0_20px_50px_rgba(47,36,29,0.08)]">
+            <div className="flex items-center gap-4 mb-8 pb-6 border-b border-[#e5d5c5]/50">
+                <div className="w-12 h-12 bg-[#f7f0e8] text-[#c1a089] rounded-xl flex items-center justify-center shrink-0 border border-[#e5d5c5]/50">
+                    <Info className="w-6 h-6" />
+                </div>
+                <div>
+                    <h3 className="text-2xl md:text-3xl font-black text-[#2f241d] tracking-tight">Seznam alergenů</h3>
+                    <p className="text-[#6f6158] text-sm md:text-base mt-1">Podle směrnice EU 1169/2011</p>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+                {allergens.map((allergen) => (
+                    <div key={allergen.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#f7f0e8] transition-colors duration-300">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#2f241d] text-white text-sm font-bold shrink-0 shadow-sm">
+                            {allergen.id}
+                        </span>
+                        <span className="text-[#2f241d] font-medium text-sm leading-tight">
+                            {allergen.name}
+                        </span>
+                    </div>
+                ))}
+            </div>
+            <p className="text-sm text-[#9a8577] mt-8 text-center italic border-t border-[#e5d5c5]/30 pt-6">
+                Pro detailnější informace o výskytu konkrétních alergenů v našich pokrmech se neváhejte zeptat naší obsluhy. Rádi vám poradíme.
+            </p>
+        </div>
+    );
+});
+
+// ==========================================
+// SKELETON LOADER
 // ==========================================
 const MenuSkeleton = () => (
     <div className="bg-white/60 backdrop-blur-md rounded-[2.5rem] p-6 md:p-10 shadow-[0_10px_40px_rgba(47,36,29,0.02)] border border-[#e5d5c5]/30 mb-10">
-        {/* Hlavička sekce */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-5 mb-8 pb-6 border-b border-[#e5d5c5]/50 animate-pulse">
             <div className="w-16 h-16 bg-[#e5d5c5] rounded-2xl shrink-0"></div>
             <div className="flex-1 w-full">
@@ -87,7 +138,6 @@ const MenuSkeleton = () => (
                 <div className="h-4 bg-[#e5d5c5]/60 rounded-full w-64 md:w-96"></div>
             </div>
         </div>
-        {/* Falešné položky */}
         <div className="flex flex-col gap-6">
             {[1, 2, 3].map((i) => (
                 <div key={i} className="flex flex-col md:flex-row md:justify-between md:items-end gap-3 border-b border-[#e5d5c5]/40 pb-5 last:border-0 last:pb-0 animate-pulse">
@@ -115,6 +165,7 @@ export default function Menu() {
 
     const [menuSections, setMenuSections] = useState<DBMenuSection[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isError, setIsError] = useState(false);
 
     const [activeTab, setActiveTab] = useState("jidlo");
     const [showScrollTop, setShowScrollTop] = useState(false);
@@ -124,13 +175,27 @@ export default function Menu() {
     // 1. Načtení dat z API
     useEffect(() => {
         fetch("http://localhost:3000/api/menu")
-            .then((res) => res.json())
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`Chyba serveru: ${res.status}`);
+                }
+                return res.json();
+            })
             .then((data) => {
-                setMenuSections(data);
+                // Pojistka: pokud API vrátí nesmysl místo pole, zachráníme to
+                if (Array.isArray(data)) {
+                    setMenuSections(data);
+                } else {
+                    console.error("Očekáváno pole dat, ale server vrátil:", data);
+                    setMenuSections([]);
+                    setIsError(true);
+                }
                 setLoading(false);
             })
             .catch((err) => {
                 console.error("Chyba při stahování menu:", err);
+                setMenuSections([]); // Nastavíme prázdné pole, aby nespadl .filter()!
+                setIsError(true);
                 setLoading(false);
             });
     }, []);
@@ -216,7 +281,7 @@ export default function Menu() {
 
             <NavHeader />
 
-            {/* HERO SEKCE (Načte se okamžitě, i když se menu z API ještě stahuje) */}
+            {/* HERO SEKCE */}
             <section className="relative px-6 md:px-14 pt-48 pb-24 z-10 overflow-hidden bg-[#1a120e]">
                 <div className="absolute inset-0 z-0">
                     <img
@@ -241,7 +306,7 @@ export default function Menu() {
                 </div>
             </section>
 
-            {/* STICKY NAVIGACE (Načte se okamžitě) */}
+            {/* STICKY NAVIGACE */}
             <div className="sticky top-24 z-40 flex justify-center w-full px-4 md:px-6 pointer-events-none pb-8 pt-4 transition-all duration-300">
                 <div className="bg-white/90 backdrop-blur-xl p-1.5 md:p-2 rounded-full border border-white shadow-[0_15px_40px_rgba(47,36,29,0.08)] pointer-events-auto flex items-center overflow-x-auto overflow-y-hidden no-scrollbar max-w-full">
                     {categories.map((category) => (
@@ -264,25 +329,40 @@ export default function Menu() {
                 </div>
             </div>
 
-            {/* VÝPIS JÍDEL */}
+            {/* VÝPIS JÍDEL A ALERGENŮ */}
             <div className="max-w-5xl mx-auto px-6 md:px-14 pt-8 pb-32 relative z-10 min-h-[60vh]">
                 {loading ? (
-                    // SKELETON LOADER
                     <div className="space-y-12">
                         <MenuSkeleton />
                         <MenuSkeleton />
                     </div>
+                ) : isError ? (
+                    // CHYBOVÝ STAV PŘI VÝPADKU DB
+                    <div className="text-center py-20 bg-white/60 backdrop-blur-md rounded-[2.5rem] p-10 border border-[#e5d5c5]/40 shadow-sm mt-12">
+                        <div className="w-16 h-16 bg-[#2f241d] text-[#c1a089] rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-md">
+                            <Utensils className="w-8 h-8" />
+                        </div>
+                        <h2 className="text-3xl font-black text-[#2f241d] mb-4">Ouha, něco se pokazilo</h2>
+                        <p className="text-[#6f6158] text-lg max-w-lg mx-auto">
+                            Aktuálně se nám nedaří načíst menu z naší databáze. Naši kuchaři už na opravě pracují. Zkuste prosím stránku obnovit za malou chvíli.
+                        </p>
+                    </div>
                 ) : (
-                    <div key={activeTab} className="space-y-12 animate-[fadeIn_0.4s_ease-out]">
-                        {filteredSections.length > 0 ? (
-                            filteredSections.map((section) => (
-                                <MenuSectionGroup key={section.id} section={section} />
-                            ))
-                        ) : (
-                            <div className="text-center py-20">
-                                <p className="text-2xl text-[#6f6158] font-bold">V této kategorii zatím nic není.</p>
-                            </div>
-                        )}
+                    // BĚŽNÝ VÝPIS
+                    <div className="animate-[fadeIn_0.4s_ease-out]">
+                        <div key={activeTab} className="space-y-12 mb-12">
+                            {filteredSections.length > 0 ? (
+                                filteredSections.map((section) => (
+                                    <MenuSectionGroup key={section.id} section={section} />
+                                ))
+                            ) : (
+                                <div className="text-center py-20">
+                                    <p className="text-2xl text-[#6f6158] font-bold">V této kategorii zatím nic není.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <AllergensInfo />
                     </div>
                 )}
             </div>
